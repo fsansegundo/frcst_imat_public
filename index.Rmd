@@ -1,0 +1,11 @@
+---
+title: "Análisis y Predicción de Series Temporales"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
++ [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
