@@ -8,8 +8,9 @@ date: "`r Sys.Date()`"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+![](QR.png){height=250px} ![](Colibri-Canada.jpg){height=250px}
 
-![](QR.png){width=250px}
+
 
 + [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
 + [Lab. 2 ARMA models](Lab_2_ARMA_grupoB_additional.html)
