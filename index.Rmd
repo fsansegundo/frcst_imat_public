@@ -13,13 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Lab 1
 
 + [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
-+ [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)
++ [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)  
+  [R Source Code](Lab_1a_StochasticProcesses_grupoB .R)
 
 <hr>
 
 ## Lab 2
 
 + [Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)
-+ [Lab. 2 Additional code for ARMA models](Lab_2_ARMA_grupoB_additional.html)
++ [Lab. 2 Additional code for ARMA models](Lab_2_ARMA_grupoB_additional.html)  
+  [R Source Code](Lab_2_ARMA_grupoB_additional.R)
 
 <hr>
