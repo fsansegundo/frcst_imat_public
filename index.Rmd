@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 + <div style="color:red">UPDATED (unified in a single document):</div>[Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)  
   [R Source Code](Lab_2_ARMA_grupoB.R)
 
-+ [**DATATHON ARMA, link de acceso**](https://arima-student-imat-b.streamlit.app/) 
+<!-- + [**DATATHON ARMA, link de acceso**](https://arima-student-imat-b.streamlit.app/)  -->
 
 + Suggested Reading:
 
