@@ -2,13 +2,14 @@
 title: "Análisis y Predicción de Series Temporales"
 output: html_document
 date: "`r Sys.Date()`"
+bibliography: "forecasting.bib"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](QR.png){height=250px} ![](frailecillos.jpg){height=250px}
+![](QR.png){height=300px} ![](frailecillos.jpg){height=250px}
 
 ## Lab 1
 
@@ -25,4 +26,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 + [**DATATHON ARMA, link de acceso**](https://arima-student-imat-b.streamlit.app/) 
 
++ Suggested Reading:
+
+  - [Ch.09 of FPP3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima)
+  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
+  - For more mathematical background [up to Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+
 <hr>
+
+## References
