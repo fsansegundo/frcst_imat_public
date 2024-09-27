@@ -37,8 +37,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Lab 4
 
-+ [Lab. 4 ARIMA models](Lab_4_ARIMA_grupoB.html)  
-  [R Source Code](Lab_4_ARIMA_grupoB.R)
++ [Lab. 4 ARIMA models](Lab4_ARIMA_grupoB.html)  
+  [R Source Code](Lab4_ARIMA_grupoB.R)
 
 + Suggested Reading:
 
