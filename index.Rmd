@@ -11,11 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ![](QR.png){height=300px} ![](136-DSCN1712-cebras.JPG){height=250px}
 
-## Lab 1
+## Lab 4
 
-+ [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
-+ [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)  
-  [R Source Code](Lab_1a_StochasticProcesses_grupoB .R)
++ [Lab. 4 ARIMA models](Lab4_ARIMA_grupoB.html)  
+  [R Source Code](Lab4_ARIMA_grupoB.R)
+
++ Suggested Reading:
+
+  - [Ch.09 of @hyndman2021fpp3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima). For the second edition see
+  [Chapter 8 of FPP2, Sections 8.1 to 8.8](https://otexts.com/fpp2/arima.html#arima)
+  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
+  - [Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+
 
 <hr>
 
@@ -35,19 +42,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <hr>
 
-## Lab 4
+## Lab 1
 
-+ [Lab. 4 ARIMA models](Lab4_ARIMA_grupoB.html)  
-  [R Source Code](Lab4_ARIMA_grupoB.R)
-
-+ Suggested Reading:
-
-  - [Ch.09 of @hyndman2021fpp3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima). For the second edition see
-  [Chapter 8 of FPP2, Sections 8.1 to 8.8](https://otexts.com/fpp2/arima.html#arima)
-  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
-  - [Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
-
++ [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
++ [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)  
+  [R Source Code](Lab_1a_StochasticProcesses_grupoB .R)
 
 <hr>
+
+
 
 ## References
