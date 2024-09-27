@@ -9,7 +9,7 @@ bibliography: "forecasting.bib"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](QR.png){height=300px} ![](frailecillos.jpg){height=250px}
+![](QR.png){height=300px} ![](136-DSCN1712-cebras.JPG){height=250px}
 
 ## Lab 1
 
@@ -21,16 +21,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Lab 2
 
-+ <div style="color:red">UPDATED (unified in a single document):</div>[Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)  
+<!-- <div style="color:red">UPDATED (unified in a single document):</div> -->
+
++ [Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)  
   [R Source Code](Lab_2_ARMA_grupoB.R)
 
-<!-- + [**DATATHON ARMA, link de acceso**](https://arima-student-imat-b.streamlit.app/)  -->
 
 + Suggested Reading:
 
   - [Ch.09 of FPP3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima)
   - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
   - For more mathematical background [up to Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+
+<hr>
+
+## Lab 4
+
++ [Lab. 4 ARIMA models](Lab_4_ARIMA_grupoB.html)  
+  [R Source Code](Lab_4_ARIMA_grupoB.R)
+
++ Suggested Reading:
+
+  - [Ch.09 of FPP3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima). For the second edition see
+  [Chapter 8 of FPP2, Sections 8.1 to 8.8](https://otexts.com/fpp2/arima.html#arima)
+  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
+  - [Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+
 
 <hr>
 
