@@ -11,9 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ![](QR.png){height=300px} ![ ](IMG_0025_Camachuelo.png){height=250px}
 
+## Lab 6
+
++ [Lab6_Prophet_v7.html](Lab6_Prophet_v7.html) 
+
 ## Lab 4
 
-+ [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html)  
++ [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html) 
   [R Source Code](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.r)
 
 

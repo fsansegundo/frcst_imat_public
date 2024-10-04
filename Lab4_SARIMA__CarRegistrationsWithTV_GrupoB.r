@@ -115,8 +115,8 @@ n <- length(y)
 n_test <- floor(5 * freq)
 
 y_split <- ts_split(y, sample.out = n_test)
-y_TR <- y_split$train
-y_TV <- y_split$test
+y.TR <- y_split$train
+y.TV <- y_split$test
 
 
 #' Alternatively, with subset
@@ -179,7 +179,9 @@ ggtsdisplay(Bz, lag.max = 4 * freq)
 
 #+ fig.width=12, fig.height=4
 B12Bz <- diff(Bz, lag = freq, differences = 1)
-ggtsdisplay(B12Bz, lag.max = 4 * 12)
+ggtsdisplay(B12Bz, lag.max = 4 * freq) 
+
+
 
 #' Remember, when you apply both differences the order does not matter. Here we 
 #' check that visually:
@@ -198,7 +200,7 @@ autoplot(B12Bz, color = "blue", size = 2) + autolayer(B_B12z, color = "orange", 
 #' 
 
 #+ echo=FALSE
-final <- FALSE
+final <- TRUE
 
 #+ eval = !final, echo=FALSE, results='asis'
 cat(' <div style="color:red"><h5>The rest of this document will not work until
@@ -209,12 +211,12 @@ next session.</h5></div>')
 
 #+ eval=final
 p <- 0
-d <- 0
-q <- 0
+d <- 1
+q <- 1
 
-P <- 0
-D <- 0
-Q <- 0
+P <- 1
+D <- 1
+Q <- 1
 
 
 #' ## Fit seasonal model with estimated order
@@ -274,7 +276,16 @@ y_est <- forecast::forecast(y.TR, model=arima.fit, h=freq)
 head(y_est$mean, n = 12)
 
 #+ eval = final, fig.width=12, fig.height=4
-autoplot(y_est)
+#+ 
+#+ 
+xmin <- 1995
+xmax <- 1996
+ymin <- 0
+ymax <- Inf
+
+autoplot(subset(y, start=length(y.TR) - 30, end=length(y.TR) + freq)) + 
+  autolayer(y_est, alpha = 0.5) +
+  annotate("rect", xmin=xmin, xmax=xmax, ymin=ymin, ymax= ymax, alpha=0.2, fill="orange") 
 
 #' ## Validation error for h = 1  
 #' 
