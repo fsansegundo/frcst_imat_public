@@ -9,7 +9,7 @@ bibliography: "forecasting.bib"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](QR.png){height=300px} ![](136-DSCN1712-cebras.JPG){height=250px}
+![](QR.png){height=300px} ![ ](IMG_0025_Camachuelo.png){height=250px}
 
 ## Lab 4
 
