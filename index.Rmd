@@ -17,11 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Lab 4
 
-<<<<<<< HEAD
 + [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html) 
-=======
-+ [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html) <span style="color:red">UPDATED.</span>  
->>>>>>> d41b4452b50fd6631bd03415f6bd72b373de1af6
   [R Source Code](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.r)
 
 
