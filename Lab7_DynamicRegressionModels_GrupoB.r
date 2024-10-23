@@ -94,7 +94,7 @@ y1 <- 0.7 * x1 + ar_noise
 #' + What is $\omega(B)$ here, what is its degree $s$?
 #' + What is $\delta(B)$ here, what is its degree $r$?
 #' + What is the lag $b$? What about $c$?
-
+#' 
 #' Next we create a multidimensional time series with these variables: input, 
 #' output and noise
 
