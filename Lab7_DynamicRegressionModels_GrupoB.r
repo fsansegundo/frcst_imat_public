@@ -144,15 +144,17 @@ abline(v = -5:5, col="orange", lty = 2)
 #' 
 #' **Notes about ccf:**  
 #' 
-#'  + the correlation of x(t) with its lag x(t -k) appears at k units *to the 
-#' right* in the ccf plot. In general the lag k value returned by ccf(x, y) 
-#' estimates the correlation between `x[t+k]` and `y[t]`.
+#'  + In general **the lag k value returned by ccf(x, y) estimates the correlation
+#'   between `x[t+k]` and `y[t]`**. When you apply it to the lag of x1, that is when
+#'   `y[t] = x1[t]` and `x[t] = x1[t - 1]` then the value k units to the right
+#'   shows the correlation between `x1[t]` and `x1[t - 1 + k]`. In this example, 
+#'   where x1 is white noise the ony non-zero value occurs at k = 1.
 #'  + You can use print(ccf(...)) to see the numeric values of the ccf
 
 
 #' If we use ccf to explore the cross correlation between the output and input 
 #' of this example we get a clear indication that they are correlated for t = 0.
-#' This is a onsequence of the equation model, but the (lack of) autocorrelation
+#' This is a consequence of the equation model, but the (lack of) autocorrelation
 #' of x1 also plays a role here.
 #' 
  
@@ -488,14 +490,14 @@ ccf(y = res, x = x2)
 #' series without the distorting effect of autocorrelation. To perform 
 #' prewhitening:
 #' 
-#' 	1.	Fit an ARIMA model to the input to remove its autocorrelations.
-#' 	2.	Obtain the residuals (should behave like white noise).
-#' 	3.	Apply the same model to the output series to get a *transformed output*.
+#' 1. Fit an ARIMA model to the input to remove its autocorrelations.
+#' 2. Obtain the residuals (should behave like white noise).
+#' 3. Apply the same model to the output series to get a *transformed output*.
 #' 	
-#' 	Finally, we can compute the ccf of the transformed output and the residuals.
+#' Finally, we can compute the ccf of the transformed output and the residuals.
 #' 	
-#' 	Fortunately there is a function in TSA that performs all this process for 
-#' 	us and directly outputs the final ccf:
+#' Fortunately there is a function in TSA that performs all this process for 
+#' us and directly outputs the final ccf:
 
 #+ fig.width=12, fig.height=4
 prewhiten(y4, x2, main="Prewhitening of y4 & x2")
