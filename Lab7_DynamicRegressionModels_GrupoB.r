@@ -150,8 +150,7 @@ abline(v = -5:5, col="orange", lty = 2)
 #'   shows the correlation between `x1[t]` and `x1[t - 1 + k]`. In this example, 
 #'   where x1 is white noise the ony non-zero value occurs at k = 1.
 #'  + You can use print(ccf(...)) to see the numeric values of the ccf
-
-
+#'  
 #' If we use ccf to explore the cross correlation between the output and input 
 #' of this example we get a clear indication that they are correlated for t = 0.
 #' This is a consequence of the equation model, but the (lack of) autocorrelation
