@@ -9,12 +9,13 @@ bibliography: "forecasting.bib"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](QR.png){height=300px} ![ ](LechuzaGavilana.png){height=250px}
+![](QR.png){height=300px} ![ ](GrullaGallocanta.png){height=250px}
 
 ## Lab 7
 
 + [Lab7_DynamicRegressionModels_GrupoB.html](Lab7_DynamicRegressionModels_GrupoB.html)  
-  [R Source Code](Lab7_DynamicRegressionModels_GrupoB.r)
+  [R Source Code](Lab7_DynamicRegressionModels_GrupoB.r)  
++ [Lab7_TF_Seasonal_GrupoB.R](Lab7_TF_Seasonal_GrupoB.R)  
 
 ## Lab 6
 
