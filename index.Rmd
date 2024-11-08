@@ -9,7 +9,16 @@ bibliography: "forecasting.bib"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](QR.png){height=300px} ![ ](GrullaGallocanta.png){height=250px}
+![](QR.png){height=300px} ![ ](179-DSCN2067 copia.JPG){height=250px}
+
+
+## Lab 10
+
++ [Lab10_MLPforecasting_grupoB.html](Lab10_MLPforecasting_grupoB.html)  
+  [R Source Code](Lab10_MLPforecasting_grupoB.r)  
+
++ [Lab10_FT_DemandTemperature_solution_grupoB.html](Lab10_FT_DemandTemperature_solution_grupoB.html)  
+  [R Source Code](Lab10_FT_DemandTemperature_solution_grupoB.r)  
 
 ## Lab 7
 
