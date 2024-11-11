@@ -7,7 +7,7 @@ bibliography: "forecasting.bib"
 
 ```{r setup, include=FALSE}  
 knitr::opts_chunk$set(echo = TRUE)
-```
+``` 
 
 ![](QR.png){height=300px} ![ ](179-DSCN2067 copia.JPG){height=250px}
 
@@ -19,6 +19,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 + [Lab10_FT_DemandTemperature_solution_grupoB.html](Lab10_FT_DemandTemperature_solution_grupoB.html)  
   [R Source Code](Lab10_FT_DemandTemperature_solution_grupoB.r)  
+
+## Lab 8
+
++ [Lab8_DynamicRegressionModelsForecastingExample.html](Lab8_DynamicRegressionModelsForecastingExample.html)
++ [Lab8_DynamicRegressionModelsForecastingExample.R](Lab8_DynamicRegressionModelsForecastingExample.R)
++ [macro_econ_TR.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TR.csv). 
++ [macro_econ_TS.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TS.csv)
 
 ## Lab 7
 
