@@ -14,6 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Lab 10
 
+Recomendamos ver el siguiente vídeo para la próxima sesión:  
+[Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) by Brandon Rohrer](https://www.youtube.com/watch?v=WCUNPb-5EYI)
+
+
+
++ [Lab10_XGBoostForecasting.html](Lab10_XGBoostForecasting.html)  
+
 + [Lab10_MLPforecasting_grupoB.html](Lab10_MLPforecasting_grupoB.html)  
   [R Source Code](Lab10_MLPforecasting_grupoB.r)  
 
