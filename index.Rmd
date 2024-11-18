@@ -9,10 +9,13 @@ bibliography: "forecasting.bib"
 knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
-![](QR.png){height=300px} ![ ](179-DSCN2067 copia.JPG){height=250px}
+![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px}
 
 
 ## Lab 10
+
++ [RNN_extra_slides.pdf](RNN_extra_slides.pdf)
+
 
 Recomendamos ver el siguiente vídeo para la próxima sesión:  
 [Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) by Brandon Rohrer](https://www.youtube.com/watch?v=WCUNPb-5EYI)
