@@ -4,13 +4,13 @@
 #' date: "2024-10-25"
 #' bibliography: "../forecasting.bib"
 #' output: 
+#'  pdf_document: default
 #'  html_document:
 #'    toc: true
 #'    toc_depth: 4
 #'    toc_float:
 #'      toc_collapsed: true
 #'    toc-location: left
-#'  # word_document: default
 #' 
 #' ---
 #' 
