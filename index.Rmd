@@ -84,7 +84,8 @@ Recomendamos ver el siguiente vídeo para la próxima sesión:
 
 ## Lab 1
 
-+ [Lab. 1 Decomposition](Lab_1_Decomposition_v2_grupoB.html)
++ [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)  
+[R Source Code](Lab_1_Decomposition_grupoB_2.R)  
 + [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)  
   [R Source Code](Lab_1a_StochasticProcesses_grupoB .R)
 
