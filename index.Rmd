@@ -1,8 +1,10 @@
 ---
-title: "Análisis y Predicción de Series Temporales"
+title: "Análisis y Predicción de Series Temporales, 2025."
 output: html_document
-date: "`r Sys.Date()`"
+date: "Last updated: `r Sys.Date()`"
 bibliography: "forecasting.bib"
+link-citations: true 
+csl: apa-6th-edition.csl
 ---
 
 ```{r setup, include=FALSE}  
@@ -12,85 +14,87 @@ knitr::opts_chunk$set(echo = TRUE)
 ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px}
 
 
-## Lab 10
+<!-- ## Lab 10 -->
 
-+ [RNN_extra_slides.pdf](RNN_extra_slides.pdf)
-
-
-Recomendamos ver el siguiente vídeo para la próxima sesión:  
-[Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) by Brandon Rohrer](https://www.youtube.com/watch?v=WCUNPb-5EYI)
+<!-- + [RNN_extra_slides.pdf](RNN_extra_slides.pdf) -->
 
 
-
-+ [Lab10_XGBoostForecasting.html](Lab10_XGBoostForecasting.html)  
-
-+ [Lab10_MLPforecasting_grupoB.html](Lab10_MLPforecasting_grupoB.html)  
-  [R Source Code](Lab10_MLPforecasting_grupoB.r)  
-
-+ [Lab10_FT_DemandTemperature_solution_grupoB.html](Lab10_FT_DemandTemperature_solution_grupoB.html)  
-  [R Source Code](Lab10_FT_DemandTemperature_solution_grupoB.r)  
-
-## Lab 8
-
-+ [Lab8_DynamicRegressionModelsForecastingExample.html](Lab8_DynamicRegressionModelsForecastingExample.html)
-+ [Lab8_DynamicRegressionModelsForecastingExample.R](Lab8_DynamicRegressionModelsForecastingExample.R)
-+ [macro_econ_TR.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TR.csv). 
-+ [macro_econ_TS.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TS.csv)
-
-## Lab 7
-
-+ [Lab7_DynamicRegressionModels_GrupoB.html](Lab7_DynamicRegressionModels_GrupoB.html)  
-  [R Source Code](Lab7_DynamicRegressionModels_GrupoB.r)  
-+ [Lab7_TF_Seasonal_GrupoB.R](Lab7_TF_Seasonal_GrupoB.R)  
-
-## Lab 6
-
-+ [Lab6_Prophet_v7.html](Lab6_Prophet_v7.html) 
-
-## Lab 4
-
-+ [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html) 
-  [R Source Code](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.r)
+<!-- Recomendamos ver el siguiente vídeo para la próxima sesión:   -->
+<!-- [Recurrent Neural Networks (RNN) and Long Short-Term Memory (LSTM) by Brandon Rohrer](https://www.youtube.com/watch?v=WCUNPb-5EYI) -->
 
 
-+ [Lab. 4 ARIMA models](Lab4_ARIMA_grupoB.html)  
-  [R Source Code](Lab4_ARIMA_grupoB.R)
 
-+ Suggested Reading:
+<!-- + [Lab10_XGBoostForecasting.html](Lab10_XGBoostForecasting.html)   -->
 
-  - [Ch.09 of @hyndman2021fpp3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima). For the second edition see
-  [Chapter 8 of FPP2, Sections 8.1 to 8.8](https://otexts.com/fpp2/arima.html#arima)
-  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
-  - [Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+<!-- + [Lab10_MLPforecasting_grupoB.html](Lab10_MLPforecasting_grupoB.html)   -->
+<!--   [R Source Code](Lab10_MLPforecasting_grupoB.r)   -->
+
+<!-- + [Lab10_FT_DemandTemperature_solution_grupoB.html](Lab10_FT_DemandTemperature_solution_grupoB.html)   -->
+<!--   [R Source Code](Lab10_FT_DemandTemperature_solution_grupoB.r)   -->
+
+<!-- ## Lab 8 -->
+
+<!-- + [Lab8_DynamicRegressionModelsForecastingExample.html](Lab8_DynamicRegressionModelsForecastingExample.html) -->
+<!-- + [Lab8_DynamicRegressionModelsForecastingExample.R](Lab8_DynamicRegressionModelsForecastingExample.R) -->
+<!-- + [macro_econ_TR.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TR.csv).  -->
+<!-- + [macro_econ_TS.csv](https://gist.githubusercontent.com/fsansegundo/4bdccfde57696118164f88a55c7d85ef/raw/4a9cf86f907a61fa47631094a7e84c7ca322d098/macro_econ_TS.csv) -->
+
+<!-- ## Lab 7 -->
+
+<!-- + [Lab7_DynamicRegressionModels_GrupoB.html](Lab7_DynamicRegressionModels_GrupoB.html)   -->
+<!--   [R Source Code](Lab7_DynamicRegressionModels_GrupoB.r)   -->
+<!-- + [Lab7_TF_Seasonal_GrupoB.R](Lab7_TF_Seasonal_GrupoB.R)   -->
+
+<!-- ## Lab 6 -->
+
+<!-- + [Lab6_Prophet_v7.html](Lab6_Prophet_v7.html)  -->
+
+<!-- ## Lab 4 -->
+
+<!-- + [Lab. 4 SARIMA models](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.html)  -->
+<!--   [R Source Code](Lab4_SARIMA__CarRegistrationsWithTV_GrupoB.r) -->
 
 
-<hr>
+<!-- + [Lab. 4 ARIMA models](Lab4_ARIMA_grupoB.html)   -->
+<!--   [R Source Code](Lab4_ARIMA_grupoB.R) -->
 
-## Lab 2
+<!-- + Suggested Reading: -->
+
+<!--   - [Ch.09 of @hyndman2021fpp3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima). For the second edition see -->
+<!--   [Chapter 8 of FPP2, Sections 8.1 to 8.8](https://otexts.com/fpp2/arima.html#arima) -->
+<!--   - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R) -->
+<!--   - [Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8)  -->
+
+
+<!-- <hr> -->
+
+<!-- ## Lab 2 -->
 
 <!-- <div style="color:red">UPDATED (unified in a single document):</div> -->
 
-+ [Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)  
-  [R Source Code](Lab_2_ARMA_grupoB.R)
+<!-- + [Lab. 2 ARMA models](Lab_2_ARMA_grupoB.html)   -->
+<!--   [R Source Code](Lab_2_ARMA_grupoB.R) -->
 
 
-+ Suggested Reading:
+<!-- + Suggested Reading: -->
 
-  - [Ch.09 of FPP3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima)
-  - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R)
-  - For more mathematical background [up to Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+<!--   - [Ch.09 of FPP3, Sections 9.1 to 9.5](https://otexts.com/fpp3/arima.html#arima) -->
+<!--   - [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R) -->
+<!--   - For more mathematical background [up to Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8)  -->
+
+<!-- <hr> -->
+
+## 2025-09-03 Session 
+
++ [Lab. 1 Decomposition, additional notes](./2025_09_03_Decomposition/2025_09_03_Decomposition.html)
+
+<!-- + [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)   -->
+<!-- [R Source Code](Lab_1_Decomposition_grupoB_2.R)   -->
+<!-- + [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)   -->
+<!--   [R Source Code](Lab_1a_StochasticProcesses_grupoB .R) -->
 
 <hr>
 
-## Lab 1
-
-+ [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)  
-[R Source Code](Lab_1_Decomposition_grupoB_2.R)  
-+ [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)  
-  [R Source Code](Lab_1a_StochasticProcesses_grupoB .R)
-
-<hr>
 
 
 
-## References

@@ -1,0 +1,427 @@
+---
+title: "2025_09_03 Decomposition, lecture notes"
+# output: html_document
+format:
+  html:
+    toc: true
+date: "`r Sys.Date()`"
+bibliography: "../forecasting.bib"
+link-citations: true 
+csl: "../apa-6th-edition.csl"
+---
+
+
+```{r message=FALSE}
+##############################################################################
+#############       Lab Practice 1: Decomposition Methods     ################
+##############################################################################
+```
+
+
+# Carga de librerías
+
+
+```{r message=FALSE}
+# Load libraries
+library(fpp2) 
+library(tidyverse)
+library(readxl)
+```
+
+En clase comentaremos **como instalar librerías de R**.
+
+# Lectura de datos
+
+En clase comentaremos **como elegir el directorio de trabajo*.
+
+```{r}
+# Load dataset -------------------------------------------------------------------------------------------------------
+fdata <- read.table("Unemployment.dat", sep = ",", header = TRUE)
+```
+
+**Ejercicio:** prueba a ejecutar esta segunda versión: 
+
+```{r echo=1}
+fdata <- read.table("Unemployment.dat", sep = ",", header = TRUE)
+# fdata <- read.table("Unemployment_gaps.dat", sep = ",", header = TRUE)
+```
+
+## Otros formatos (e.g. Excel)
+
+```{r eval=FALSE}
+fdata2 <- read_excel("Unemployment.xlsx")
+```
+
+Para visualizar un objeto en R podemos simplemente usar su nombre. ¡Pero con objetos grandes no es una buena idea!
+
+```{r results='hide'}
+# Visualize data
+fdata
+```
+
+Es mejor usar `head` y `tail`
+
+```{r}
+head(fdata)
+```
+
+
+```{r}
+tail(fdata, 10)
+```
+
+Las funciones `glimpse` y `str` proporcionan información sobre la estructura de datos. 
+
+```{r}
+glimpse(fdata)
+```
+¿Qué tipo de objeto es `fdata`?
+
+```{r}
+str(fdata)
+```
+
+Es un data.frame, una estructura tabular heterogénea básica en R. Para aprender un poco más puede usar el siguiente **Tutorial sobre R (nivel básico)**:
+
+[R Tutorial – An Introduction for Beginners](https://www.evamariakiss.de/tutorial/r/)
+
+# Exploratory Data Analysis for Time Series
+
+## Frecuencia de la serie temporal
+
+**Esta es la pregunta más importante que debes hacerte al principio del trabajo con una serie temporal:**
+
+```{r}
+# What is the frequency of observation for this data.
+# Is this data yearly? (or quarterly, monthly, weekly, daily,...)
+
+
+# Check for missing dates
+fdata$DATE <- as.Date(fdata$DATE, format = "%d/%m/%Y")
+```
+
+**Notas:**
+
++ `<-` es la asignación en R (atajos de teclado en RStudio). 
++ `$` permite acceder por nombre a una columna de un data.frame
+
+
+Siempre es conveniente asegurarse de ordenar la serie temporal por fecha
+
+```{r}
+fdata <- fdata %>% arrange(DATE)
+# same as: fdata <- arrange(fdata,DATE)
+```
+
+El operador `%>%` es un `pipe`.
+
+¿Qué ha cambiado con `as.Date`?
+
+```{r}
+glimpse(fdata)
+```
+
+## Dos posibles formas de tener datos ausentes en series temporales
+
+### huecos temporales
+
+Puede haber fechas que faltan en la serie. Cuidado: es fácil que pasen inadvertiddos.
+
+```{r}
+# How do we know if there are time gaps in the data?
+range(fdata$DATE)
+min(fdata$DATE)
+max(fdata$DATE)
+```
+
+
+```{r}
+# Therefore we can create a complete sequence of months with the same range and
+# compare it to the dates in our data.
+date_range <- seq.Date(min(fdata$DATE), max(fdata$DATE), by = "months")
+
+head(date_range)
+tail(date_range)
+```
+
+**Sugerencia:** prueba a cambiar `by = "months"` por `by = "weeks"` (y luego asegúrate de deshacer el cambio)
+
+**Pregunta:** ¿qué tipo de objeto es `date_range`?
+
+```{r}
+# Now we do the comparison
+date_range[!date_range %in% fdata$DATE]
+```
+
+Si el resultado es `Date of length 0` es que no hay huecos temporales. Si los hay, aparecerán.
+
+**Ejercicio:**
+
+1. Crea una copia de `Unemployment.dat` en la misma carpeta, llámala `Unemployment_gaps.dat`
+2. Elimina la tercera fecha de ese fichero usando un *editor de texto*.
+3. Ejecuta todo el código anterior cambiando de fichero. *Indicación:* usa el menú `Code/ Re-run Previous`.
+4. Observa el resultado del último comando. Debe ser
+    ```
+    [1] "2010-03-01"
+    ```
+5. Deshaz los cambios y vuelve a ejecutar todo el código. *Indicación:* aprende a comentar y descomentar líneas de manera eficiente.
+
+
+## Curso relámpago de selección en R:
+
+Vamos a usar la **evaluación parcial** de RStudio para entender el comando.
+
+```{r eval=FALSE}
+date_range[!date_range %in% fdata$DATE]
+```
+
+Pero para eso necesitamos entender cómo se selecciona elementos de un vector en R (en este caso, el vector `date_range`).
+
+```{r}
+# genero un vector de 15 números del 1 al 10 en orden aleatorio (pero reproducible)
+set.seed(2025)
+a <- sample(1:10, 15, replace = TRUE)
+a
+```
+
+Selecciono los tres primeros
+
+```{r}
+a[c(1, 2, 3)]
+# es lo mismo que
+a[1:3]
+```
+
+Selecciono posiciones no consecutivas
+
+```{r}
+a[c(4, 2, 6)]
+```
+
+Condicionales y vectores booleanos:
+
+```{r}
+a < 6
+```
+
+y uso esto como *selector*
+
+```{r}
+a[a < 6]
+```
+
+**Pregunta:** ¿qué hace la función `which`? Más en general, ¿cómo obtengo ayuda en R?
+
+## Datos ausentes clásicos
+
+Es decir, los NA habituales en una variable no temporal.
+
+```{r}
+sum(is.na(fdata$TOTAL))
+```
+
+**Ejercicio:** usa la evaluación parcial de nuevo para entender lo que hemos hecho aquí
+
+Más adelante veremos en detalle cómo tratar el problema de los datos ausentes.
+
+
+# Time series `ts` object 
+
++ Lectura recomendada:  
+*Hands-On Time Series Analysis with R* de R. Krispin @Krispin2019
++ Otra lectura sugerida (2017):  
+[Time Series Analysis in R Part 1: The Time Series Object](https://datascienceplus.com/time-series-analysis-in-r-part-1-the-time-series-object/)  
+[Time Series Analysis in R Part 2: Time Series Transformations](https://datascienceplus.com/time-series-analysis-in-r-part-2-time-series-transformations/)  
+
+```{r}
+# Convert to time series object
+# start -> year
+# frequency = 12 -> monthly data
+# frequency = 4 -> quarterly data
+y <- ts(fdata$TOTAL, start = c(2010,1), frequency = 12)
+```
+
+¿Qué aspecto tiene `y`?
+
+```{r}
+head(y, 20)
+```
+
+**Nota:** las funciones `head` y `tail` funcionan bien con objetos `ts` y a menudo son la forma más sencilla de *dividir* una serie temporal (por ejemplo, para hacer un split entre train y test).
+
+# Time Series Graphics
+
+El gráfico básico es un `time plot`. Lo podemos obtener con `autoplot` 
+
+```{r}
+#Plot time series:
+autoplot(y) +
+  ggtitle("Unemployment in Spain") +
+  xlab("Year") + ylab("Number unemployed")
+```
+
+o con una función más básica como `plot.ts`
+
+```{r}
+# or:
+plot.ts(y, 
+        main="Unemployment in Spain",
+        xlab="Year",
+        ylab="Number unemployed")
+```
+
+# La función `window` para seleccionar en series temporales
+
+La función `window` permite extraer una parte de la serie temporal. Podemos indicar comienzo y final de la selección, pero a menudo usaremos `window` para dividir la serie en algo como: 
+
++ `y_a` es *datos hasta 2019 inclusive*, 
++ `y_b` es *datos desde 2020 inclusive.
+
+Esto se puede hacer con `window` así:
+
+
+```{r}
+# Select time series time frame
+y_a <- window(y, end = c(2019, 12))
+y_b <- window(y, start = c(2020,1))
+```
+
+Comprobemos:
+
+```{r}
+tail(y_a)
+```
+
+
+```{r}
+head(y_b)
+```
+
+
+Vamos a pintarlas juntas para visualizar esta división:
+
+
+```{r}
+#Plot time series
+autoplot(y_a, color="orange") +
+  autolayer(y_b, color = "blue") +
+  ggtitle("Unemployment in Spain") +
+  xlab("Year") + ylab("Number unemployed")
+```
+
+También se puede usar `window` con `start` y `end` a la vez.
+
+```{r}
+# or:
+y_c <- window(y, start = c(2015, 1), end = c(2017, 12))
+y_c
+```
+
+**Ejercicio:** 
+
++ examina `y_c`. ¿Puedes añadirla al gráfico anterior?
++ **Opcional:** ¿qué pasa si usas esta versión? `y_c <- window(y, start = c(2015, 1), end = c(2017, 12), frequency=4)`
+
+
+```{r eval=FALSE}
+autoplot(y_a, color="orange") +
+  autolayer(y_b, color = "blue") +
+  autolayer(y_c, color = "red") +
+  ggtitle("Unemployment in Spain") +
+  xlab("Year") + ylab("Number unemployed")
+```
+
+# Decomposition methods
+
+La función `decompose` permite obtener descomposiciones clásicas.
+
+
+```{r}
+#################################################################################
+# Decomposition methods
+#################################################################################
+
+## Classical additive decomposition
+y_dec_add <- decompose(y, type="additive")
+```
+
+**Pregunta:** 
+
++ ¿qué clase de objeto es `y_dec_add`?
++ consulta la ayuda de `decompose` para ver cómo puedes extraer las componentes a partir de `y_dec_add`.
+
+```{r eval=FALSE, echo=FALSE}
+head(seasonal(y_dec_add), 36)
+head(trendcycle(y_dec_add), 36)
+head(remainder(y_dec_add), 36)
+head(seasadj(y_dec_add), 36)
+```
++ Usa `head` para explorar el comienzo de la serie de tendencia. ¿Qué ocurre y por qué?
+
+
+
+
+La descomposición puede representarse gráficamente con `autoplot`:
+
+```{r}
+autoplot(y_dec_add) + xlab("Year") +
+  ggtitle("Classical additive decomposition")
+```
+
+En clase veremos el significado de esos rectángulos grises. La descomposición multiplicativa es similar.
+
+
+```{r}
+## Classical Multiplicative decomposition
+y_dec_mult <- decompose(y, type="multiplicative")
+autoplot(y_dec_mult) + xlab("Year") +
+  ggtitle("Classical multiplicative decomposition")
+```
+
+Para obtener otro tipo de descomposiciones debemos cargar librerías adicionales. Por ejemplo, `seas` de la librería `seasonal`
+
+
+```{r}
+## SEATS
+library(seasonal)
+y_dec_seas <- seas(y)
+```
+
+De nuevo con autoplot podemos visualizar esta descomposición.
+
+```{r}
+autoplot(y_dec_seas) + xlab("Year") +
+  ggtitle("SEATS decomposition")
+```
+
+
+El resto del código compara las distintas descomposiciones gráficamente.
+
+
+```{r}
+# Use seasonal(), trendcycle() and remainder() functions to extract the individual components.
+# Use seasadj() to compute the seasonally adjusted time series.
+
+#Compare seasonal components
+autoplot(seasonal(y_dec_mult), series = "Multiplicative") +
+  forecast::autolayer(seasonal(y_dec_seas), series = "SEATS")
+```
+
+
+```{r}
+#Compare seasonal adjustment components (i.e. subtracting the seasonal component from the raw series)
+autoplot(seasadj(y_dec_add), series = "Additive") +
+  forecast::autolayer(seasadj(y_dec_mult), series = "Multiplicative") +
+  forecast::autolayer(seasadj(y_dec_seas),series = "SEATS")
+```
+
+
+## References
+
+
+---
+nocite: |
+  @hyndman2021fpp3, @Krispin2019
+---
+
+

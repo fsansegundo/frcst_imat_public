@@ -1,17 +1,11 @@
 #' ---
-#' title: "Lab. 1 Decomposition"
+#' title: "Lab. 1 Decomposition, additional notes."
 #' author: "Análisis y Predicción de Series Temporales, 3º B IMAT"
-#' date: "2024-11-29"
+#' date: "2025-09-03"
 #' output: 
 #'  html_document:
 #'    toc: true
 #' ---
-
-
-#' 
-#' #  Lab Practice 1: Decomposition Methods
-#' 
-#' 
 
 
 #' # Preliminaries
