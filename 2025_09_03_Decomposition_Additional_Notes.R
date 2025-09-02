@@ -411,5 +411,6 @@ tvs_MA_ts <- ts(data = tvs_data[,-1],
 
 head(tvs_MA_ts)
 
-autoplot(tvs_MA_ts[ , 4], color = "yellow", size = 3, alpha = 0.5) + 
-  autolayer(decompose(tvs_ts, type="additive")$trend)
+autoplot(tvs_MA_ts[ , 4], color = "orange", size = 2, alpha = 0.8) + 
+  autolayer(decompose(tvs_ts, type="additive")$trend, color = "black") + 
+  autolayer(tvs_ts, alpha = 0.5, color = "tan")
