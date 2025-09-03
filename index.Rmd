@@ -87,6 +87,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 2025-09-03 Session 
 
 + [Lab. 1 Decomposition, additional notes](./2025_09_03_Decomposition/2025_09_03_Decomposition.html)
++ **Recommended reading:** [Chapters 1 and 2 of fpp2](https://otexts.com/fpp2/). Also watch the videos in the corresponding [chapters of fpp3](https://otexts.com/fpp3/)
++ [Forecasting: Principles and Practice, the Pythonic Way](https://otexts.com/fpppy/)
++ [Time-Series Forecasting: Deep Learning vs Statistics](https://medium.com/data-science/time-series-forecasting-deep-learning-vs-statistics-who-wins-c568389d02df). A Medium post (2023) by N. Kafritsas.
++ [Python code](Lab_1_Decomposition.html)
 
 <!-- + [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)   -->
 <!-- [R Source Code](Lab_1_Decomposition_grupoB_2.R)   -->
