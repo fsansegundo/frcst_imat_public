@@ -35,6 +35,7 @@ En clase comentaremos **como instalar librerías de R**.
 En clase comentaremos **como elegir el directorio de trabajo*.
 
 ```{r}
+# Line 13
 # Load dataset -------------------------------------------------------------------------------------------------------
 fdata <- read.table("Unemployment.dat", sep = ",", header = TRUE)
 ```
@@ -55,6 +56,7 @@ fdata2 <- read_excel("Unemployment.xlsx")
 Para visualizar un objeto en R podemos simplemente usar su nombre. ¡Pero con objetos grandes no es una buena idea!
 
 ```{r results='hide'}
+# Line 18
 # Visualize data
 fdata
 ```
@@ -92,6 +94,7 @@ Es un data.frame, una estructura tabular heterogénea básica en R. Para aprende
 **Esta es la pregunta más importante que debes hacerte al principio del trabajo con una serie temporal:**
 
 ```{r}
+# Line 22
 # What is the frequency of observation for this data.
 # Is this data yearly? (or quarterly, monthly, weekly, daily,...)
 
@@ -109,6 +112,7 @@ fdata$DATE <- as.Date(fdata$DATE, format = "%d/%m/%Y")
 Siempre es conveniente asegurarse de ordenar la serie temporal por fecha
 
 ```{r}
+# Line 28
 fdata <- fdata %>% arrange(DATE)
 # same as: fdata <- arrange(fdata,DATE)
 ```
@@ -128,6 +132,7 @@ glimpse(fdata)
 Puede haber fechas que faltan en la serie. Cuidado: es fácil que pasen inadvertiddos.
 
 ```{r}
+# Line 32
 # How do we know if there are time gaps in the data?
 range(fdata$DATE)
 min(fdata$DATE)
@@ -136,6 +141,7 @@ max(fdata$DATE)
 
 
 ```{r}
+# Line 37
 # Therefore we can create a complete sequence of months with the same range and
 # compare it to the dates in our data.
 date_range <- seq.Date(min(fdata$DATE), max(fdata$DATE), by = "months")
@@ -149,6 +155,7 @@ tail(date_range)
 **Pregunta:** ¿qué tipo de objeto es `date_range`?
 
 ```{r}
+# Line 44
 # Now we do the comparison
 date_range[!date_range %in% fdata$DATE]
 ```
@@ -217,6 +224,7 @@ a[a < 6]
 Es decir, los NA habituales en una variable no temporal.
 
 ```{r}
+# Line 46
 sum(is.na(fdata$TOTAL))
 ```
 
@@ -234,6 +242,7 @@ Más adelante veremos en detalle cómo tratar el problema de los datos ausentes.
 [Time Series Analysis in R Part 2: Time Series Transformations](https://datascienceplus.com/time-series-analysis-in-r-part-2-time-series-transformations/)  
 
 ```{r}
+# Line 48
 # Convert to time series object
 # start -> year
 # frequency = 12 -> monthly data
@@ -254,6 +263,7 @@ head(y, 20)
 El gráfico básico es un `time plot`. Lo podemos obtener con `autoplot` 
 
 ```{r}
+# Line 54
 #Plot time series:
 autoplot(y) +
   ggtitle("Unemployment in Spain") +
@@ -263,6 +273,7 @@ autoplot(y) +
 o con una función más básica como `plot.ts`
 
 ```{r}
+# Line 60
 # or:
 plot.ts(y, 
         main="Unemployment in Spain",
@@ -281,6 +292,7 @@ Esto se puede hacer con `window` así:
 
 
 ```{r}
+# Line 65
 # Select time series time frame
 y_a <- window(y, end = c(2019, 12))
 y_b <- window(y, start = c(2020,1))
@@ -302,6 +314,7 @@ Vamos a pintarlas juntas para visualizar esta división:
 
 
 ```{r}
+# Line 71
 #Plot time series
 autoplot(y_a, color="orange") +
   autolayer(y_b, color = "blue") +
@@ -337,6 +350,7 @@ La función `decompose` permite obtener descomposiciones clásicas.
 
 
 ```{r}
+# Line 77
 #################################################################################
 # Decomposition methods
 #################################################################################
@@ -364,6 +378,7 @@ head(seasadj(y_dec_add), 36)
 La descomposición puede representarse gráficamente con `autoplot`:
 
 ```{r}
+# Line 84
 autoplot(y_dec_add) + xlab("Year") +
   ggtitle("Classical additive decomposition")
 ```
@@ -372,6 +387,7 @@ En clase veremos el significado de esos rectángulos grises. La descomposición 
 
 
 ```{r}
+# Line 88
 ## Classical Multiplicative decomposition
 y_dec_mult <- decompose(y, type="multiplicative")
 autoplot(y_dec_mult) + xlab("Year") +
@@ -382,6 +398,7 @@ Para obtener otro tipo de descomposiciones debemos cargar librerías adicionales
 
 
 ```{r}
+# Line 94
 ## SEATS
 library(seasonal)
 y_dec_seas <- seas(y)
@@ -390,6 +407,7 @@ y_dec_seas <- seas(y)
 De nuevo con autoplot podemos visualizar esta descomposición.
 
 ```{r}
+# Line 96
 autoplot(y_dec_seas) + xlab("Year") +
   ggtitle("SEATS decomposition")
 ```
