@@ -1,0 +1,264 @@
+---
+title: "2025_09_10 Stochastic Processes, ARMA Processes, lecture notes"
+# output: html_document
+format:
+  html:
+    toc: true
+date: "`r Sys.Date()`"
+bibliography: "../forecasting.bib"
+link-citations: true 
+csl: "../apa-6th-edition.csl"
+---
+
+
+```{r message=FALSE}
+#####################################################################
+##########       Lab Practice 2:      ARMA models         ###########
+#####################################################################
+```
+
+
+# Load the required libraries 
+
+## MLTools setup
+
+MLTools is a library of R functions developed here at ICAI. To install it you need to download the compressed code file from this link to Moodle:
+
+[MLTools_0.0.31.tar.gz](https://sifo.comillas.edu/mod/resource/view.php?id=3576091)
+
+Then in RStudio use the *Packages* tab in the bottom right panel, click the *Install* button  and then, in the window that opens, make sure to select *Package Archive File* as indicated below:
+
+![](./MLTools_setup_01.png){width=cm, align=center}
+
+Navigate to the folder where you downloaded the MLTools file, select that file with *Open*, and then click *Install*. 
+
+After that you can proceed to load the remaining libraries. You may also need to install `lmtest` (using CRAN this time).
+
+```{r message=FALSE}
+library(MLTools)
+library(fpp2)
+library(tidyverse)
+library(readxl)
+library(lmtest) #contains coeftest function
+```
+
+## Set working directory
+
+
+```{r eval=FALSE}
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+# White Noise
+
+We will create a gaussian white noise time series. In order to do that we get a sample of n random values from a standard normal. 
+
+```{r}
+n <- 150
+z <- rnorm(n, mean = 0, sd = 1) 
+```
+
+0 and 1 are the default values for rnorm so this is equivalent to `rnorm(n)``
+
+```{r}
+head(z, 30)
+```
+
+
+Now we use this to define a ts  object. Note that now we are **not** providing the frequency, start, etc. In this case, the ts function will create a time index using the natural numbers t = 1, 2, 3, ...
+
+```{r}
+w <- ts(z)
+head(w, 25)
+```
+
+
+## Time plot of the white noise time series:
+
+```{r}
+autoplot(w) +
+  ggtitle("White noise") + 
+  geom_point(aes(x = 1:n, y = z), size=1.5, col="blue")
+```
+
+
+## ACF and PACF of white noise
+
+```{r}
+ggtsdisplay(w, lag.max = 20)
+```
+
+
+# Random walks
+
+A random walk is an stochastic process usually defined by the recursive equation:
+$$y_t = k + y_{t-1} + w_t$$
+where $w_t$ is white noise. The value $k$ is the *drift constant*. If we set $y_0 = 0$ an equivalent definition of random walk is:
+$$y_t = k\cdot t + w_1 + w_2 + ... + w_t$$
+
+Let us use this to simulate n values of a random walk with drift:
+
+```{r}
+n = 1000
+set.seed(2024)
+
+# Let k be the drift constant
+k = 0.1
+
+# Create the white noise time series values:
+w = 10 * rnorm(n)
+
+# and then
+rw_ts = ts(k * (1:n)  + cumsum(w))
+```
+
+This is the time plot, note that it does not look like noise any more!
+
+```{r}
+autoplot(rw_ts) +
+  ggtitle("Random walk with drift") 
+```
+
+## ACF and PACF of random walk
+
+```{r}
+ggtsdisplay(rw_ts, lag.max = 50)
+```
+
+The presence of the linear trend translates into a slow decay in the ACF
+
+# ACF for a seasonal series
+
+For a seasonal series the ACF function also displays patterns related to the seasonal period:
+
+```{r}
+autoplot(AirPassengers)
+sp = 12
+# ACF and PACF
+ggtsdisplay(AirPassengers)
+```
+
+To examine the individual ACF values we can use:
+
+```{r}
+Acf(AirPassengers,lag.max = 2 * sp, plot = FALSE)
+```
+
+And to visualize the correlation between lagged versions of the time series we can use a *lag plot*:
+
+```{r}
+gglagplot(AirPassengers, seasonal = FALSE, do.lines = FALSE, colour = FALSE)
+```
+
+We can also examine a time plot of the series and its lagged version to understand what is happening:
+
+```{r}
+k <- 7
+lagged <- stats::lag(AirPassengers, k)
+AirPassengers_lag <- cbind(Original = AirPassengers, lagged = lagged)
+head(AirPassengers_lag, k + 2)
+
+ts.plot(AirPassengers_lag,
+        lty = 1:2,
+        main = "AirPassengers and lagged Series", 
+        ylab = "Passengers", xlab = "Time")
+legend("topleft", legend = c("Original", "lagged"), 
+       lty = 1:2)
+```
+
+
+# ARMA processes
+
+Now let us turn to ARMA processes
+
+```{r}
+# Line 14
+## Load dataset 
+
+fdata <- read_excel("ARMA_series.xls")
+#fdata <- read_excel("ARMA_Hackaton_data.xls")
+```
+
+```{r}
+# Line 18
+# Convert to time series object
+fdata_ts <- ts(fdata)
+
+head(fdata_ts)
+```
+
+```{r}
+# Line 23
+# index to select a time series
+y <- fdata_ts[ ,2]
+```
+
+```{r}
+# Line 27
+## Identification and fitting frocess -------------------------------------------------------------------------------------------------------
+
+# ACF and PACF of the time series -> identify significant lags and order
+ggtsdisplay(y, lag.max = 20)
+```
+
+```{r}
+# Line 32
+# Fit model with estimated order
+arima.fit <- Arima(y, order=c(1,0,1), include.mean = TRUE)
+
+summary(arima.fit) # summary of training errors and estimated coefficients
+```
+
+```{r}
+# Line 37
+coeftest(arima.fit) # statistical significance of estimated coefficients
+```
+
+```{r}
+# Line 39
+autoplot(arima.fit) # root plot
+```
+
+```{r}
+# Line 41
+# Check residuals
+CheckResiduals.ICAI(arima.fit, bins = 100, lags = 20)
+```
+
+```{r}
+# Line 44
+# If residuals are not white noise, change order of ARMA
+ggtsdisplay(residuals(arima.fit), lag.max = 20)
+```
+
+```{r}
+# Line 49
+# Check fitted forecast
+autoplot(y, series = "Real") +
+  forecast::autolayer(arima.fit$fitted, series = "Fitted")
+```
+
+```{r}
+# Line 53
+## Simulate ARMA time series -------------------------------------------------------------------------------------------------------
+sim_ts <- arima.sim(n = 250,
+                 list(ar = c(0.8897, -0.4858), ma = c(-0.2279, 0.2488)),
+                 sd = sqrt(0.1796))
+```
+
+```{r}
+# Line 53
+#Perform future forecast
+y_est <- forecast::forecast(arima.fit, h=5)
+autoplot(y_est)
+```
+
+## References
+
+
+---
+nocite: |
+  @hyndman2021fpp3, @Krispin2019
+---
+
+

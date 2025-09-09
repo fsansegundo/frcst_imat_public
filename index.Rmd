@@ -11,8 +11,30 @@ csl: apa-6th-edition.csl
 knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
-![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px}
+<!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
+![](QR.png){height=350px} ![ ](tucan.png){height=350px}
 
+## 2025-09-10 Session 
+
++ [Lab 2 ARMA models, additional notes](./2025_09_10_StochasticProcess_ARMA/2025_09_10_StochasticProcess_ARMA.html)
+
+
+## 2025-09-03 Session 
+
++ [Lab. 1 Decomposition, additional notes](./2025_09_03_Decomposition/2025_09_03_Decomposition.html)
++ **Recommended reading:** [Chapters 1 and 2 of fpp2](https://otexts.com/fpp2/). Also watch the videos in the corresponding [chapters of fpp3](https://otexts.com/fpp3/)
++ [Forecasting: Principles and Practice, the Pythonic Way](https://otexts.com/fpppy/)
++ [Time-Series Forecasting: Deep Learning vs Statistics](https://medium.com/data-science/time-series-forecasting-deep-learning-vs-statistics-who-wins-c568389d02df). A Medium post (2023) by N. Kafritsas.
++ [Python code](./2025_09_03_Decomposition/Lab_1_Decomposition.html)
+
+
+
+<!-- + [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)   -->
+<!-- [R Source Code](Lab_1_Decomposition_grupoB_2.R)   -->
+<!-- + [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)   -->
+<!--   [R Source Code](Lab_1a_StochasticProcesses_grupoB .R) -->
+
+<hr>
 
 <!-- ## Lab 10 -->
 
@@ -84,20 +106,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- <hr> -->
 
-## 2025-09-03 Session 
-
-+ [Lab. 1 Decomposition, additional notes](./2025_09_03_Decomposition/2025_09_03_Decomposition.html)
-+ **Recommended reading:** [Chapters 1 and 2 of fpp2](https://otexts.com/fpp2/). Also watch the videos in the corresponding [chapters of fpp3](https://otexts.com/fpp3/)
-+ [Forecasting: Principles and Practice, the Pythonic Way](https://otexts.com/fpppy/)
-+ [Time-Series Forecasting: Deep Learning vs Statistics](https://medium.com/data-science/time-series-forecasting-deep-learning-vs-statistics-who-wins-c568389d02df). A Medium post (2023) by N. Kafritsas.
-+ [Python code](./2025_09_03_Decomposition/Lab_1_Decomposition.html)
-
-<!-- + [Lab. 1 Decomposition](Lab_1_Decomposition_grupoB_2.html)   -->
-<!-- [R Source Code](Lab_1_Decomposition_grupoB_2.R)   -->
-<!-- + [Lab. 1. Additional code, Stochastic Processes](Lab_1a_StochasticProcesses_grupoB.html)   -->
-<!--   [R Source Code](Lab_1a_StochasticProcesses_grupoB .R) -->
-
-<hr>
 
 
 
