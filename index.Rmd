@@ -17,6 +17,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 2025-09-10 Session 
 
 + [Lab 2 ARMA models, additional notes](./2025_09_10_StochasticProcess_ARMA/2025_09_10_StochasticProcess_ARMA.html)
++ **Recommended reading:** [Section 2.9 and Chapters 3 and 6 of fpp2](https://otexts.com/fpp2/). Also watch the videos in the corresponding [chapters of fpp3](https://otexts.com/fpp3/)
++ [Examples of MA process](./2025_09_10_StochasticProcess_ARMA/2025_09_10_StochasticProcess_ARMA_files/MA_examples.html)
+
 
 
 ## 2025-09-03 Session 

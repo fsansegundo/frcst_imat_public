@@ -1,0 +1,30 @@
+---
+title: "A moving average process example"
+format: html
+---
+
+## Milk stock example
+
+AR(p) models (that is, autoregressive models of order p) and, in particular, those of order 1, are found in many examples that make them quite intuitive. A mechanical system with overdamped oscillations and random perturbations can be one such example. Also, think of a water tank which outputs an amount of water proportional to the water level while receiving a random input amount of water. 
+
+However, moving average examples do not come as easy to us when thinking about in real life processes, because the connection of the random component to the variable of interest is not as straightforward as in AR processes. The following example is adpated from a [*Cross Validated* post and discussion titled *Real-life examples of moving average processes*](https://stats.stackexchange.com/questions/45026/real-life-examples-of-moving-average-processes).
+
+
+Assume that you run a dairy products company and let $x_t$ be the amount of milk that enters your company every week (imagine that you receive this amount first thing in each production week). Assume also that 
+$$
+x_t = m + \epsilon_t
+$$
+where $m$ is the mean incoming amount while $\epsilon_t$ is a noise term, maybe due to random fluctuations in your supply chain. 
+
+Let $y_t$ be the amount of milk that you have in stock at the beginning of the week. And suppose further that your company operation means that each week you use a fixed fraction $0 < \theta < 1$ of the incoming milk, while the remaining $\theta$ fraction remains in the stock to be used the next week. You can not keep it in storage for a longer period!
+
+Then:
+$$
+y_t = x_t + \theta\, x_{t - 1} = \\
+m +  \epsilon_t + \theta\, (m +  \epsilon_{t - 1}) = \\
+\mu + \epsilon_t + \theta\,  \epsilon_{t - 1}
+$$
+where $\mu = m (1 +  \theta)$. This is the defining equation of the MA(1) process. If we deal with a different product and we could store it for longer, then the order of the process could be higher (e.g. MA(2) if we can keep it for two weeks). 
+
+This is an example with $\theta > 0$. For a nice example with $\theta < 0$ involving lemonade, check out this [YouTube video by Ben Lambert](https://www.youtube.com/watch?v=lUhtcP2SUsg). 
+
