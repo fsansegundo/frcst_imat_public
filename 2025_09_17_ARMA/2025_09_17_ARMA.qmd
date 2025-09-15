@@ -1,0 +1,151 @@
+---
+title: "2025_09_17 ARMA Processes, additional lecture notes"
+# output: html_document
+format:
+  html:
+    toc: true
+date: "`r Sys.Date()`"
+bibliography: "../forecasting.bib"
+link-citations: true 
+csl: "../apa-6th-edition.csl"
+---
+
+
+```{r message=FALSE}
+#####################################################################
+##########       Lab Practice 2:      ARMA models         ###########
+#####################################################################
+```
+
+
+# Load the required libraries 
+
+
+```{r message=FALSE}
+library(MLTools)
+library(fpp2)
+library(tidyverse)
+library(readxl)
+library(lmtest) #contains coeftest function
+```
+
+## Set working directory
+
+
+```{r eval=FALSE}
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+# Converting dates from *last* to *first* day of the month for EDA
+
+This section solves one pending issue from previous sessions, describing an example of the kind of date/time manipulation that is often required when working with time series data. 
+
+
+```{r echo=FALSE, results='hide'}
+library(lubridate)
+
+# Define the start and end dates
+start_date <- ymd("1982-01-01")
+end_date   <- ymd("1997-12-01")
+
+# Generate sequence of first day of each month
+first_days <- seq(from = start_date, to = end_date, by = "month")
+
+# Convert each to last day of month using lubridate::ceiling_date - days(1)
+last_days <- ceiling_date(first_days, "month") - days(1)
+
+ndays <- length(last_days)
+
+data_y <- signif(0.005 * 1:ndays + rnorm(ndays), 4)
+
+# autoplot(ts(data_y))
+
+write_csv(tibble(date = last_days, value = data_y), 
+          file = "month_final_day.csv")
+
+```
+
+We load the data in this example, from the file *month_final_day.csv*
+
+```{r}
+fdata <- read.table("month_final_day.csv", header = TRUE, sep = ",")
+head(fdata)
+```
+As you can see we have monthly data but the dates correspond to the last day of the month. That can be hard to deal with because of the irregularity in the length of the months. Therefore we convert it to first day of the month below. This conversion is **purely for exploratoru purposes**. *If the precise day of data collection is relevant in any way, you need to be extra cautious when doing this.*
+
+First we need to acknowledge the format in the file, converting the column into a `date` object in R:
+
+```{r}
+fdata$date <- as.Date(fdata$date, format = "%Y-%m-%d")
+head(fdata)
+```
+
+Now we can use the `format` function to convert it back to character strings, but with the format of our choice. In the code below we choose to fix the *day* part of the date as `01`. But you could try things like `format = "%Y %b" (try it!) to get different results.
+
+```{r}
+fdata$date <- format(fdata$date, format = "%Y-%m-01")
+# fdata$date <- format(fdata$date, format = "%Y %b")
+head(fdata)
+```
+
+
+Note however that whatever the format you choose, we have fallen back to strings. So for the rest of the EDA we need to apply `as.Date` a second time:
+
+```{r}
+fdata$date <- format(fdata$date, format = "%Y-%m-%d")
+head(fdata)
+```
+
+
+# Generating AR and MA time series from white noise
+
+## White noise as starting point
+
+We begin creating a gaussian white noise time series. In order to do that we get a sample of n random values from a standard normal. 
+
+```{r}
+n <- 500
+
+set.seed(42)
+w <- ts(rnorm(n, mean = 0, sd = 1))
+head(w, 25)
+```
+
+## Generating a pure autoregressive AR(2) time series
+
+```{r}
+set.seed(42)
+n <- 500
+w <- rnorm(n)
+
+phi <- c(1/3, 1/2)
+
+y <- rep(0, n)
+
+y[1] <- w[1]
+y[2] <- -phi[1] * y[1] + w[2]
+
+for (t in 3:n){
+  y[t] <- phi[1] * y[t - 1] + phi[2] * y[t - 2] + w[t]
+}
+
+y <- ts(y)
+
+autoplot(y)
+ggtsdisplay(y, lag.max = min(n/5, 50))
+```
+
+
+
+
+
+
+## References
+
+
+---
+nocite: |
+  @hyndman2021fpp3, @Krispin2019
+---
+
+
