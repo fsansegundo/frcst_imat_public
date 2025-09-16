@@ -1,0 +1,106 @@
+---
+title: "2025_09_17 ARMA Processes, some theoretical results"
+# output: html_document
+format:
+  html:
+    toc: true
+    toc-depth: 4
+date: "`r Sys.Date()`"
+bibliography: "../forecasting.bib"
+link-citations: true 
+csl: "../apa-6th-edition.csl"
+---
+
+This file is a theoretical supplement to support and extend the content of [2025_09_17_ARMA](./2025_09_17_ARMA.html). It is largely based in @shumwaystoffer2017 and @hyndman2021fpp3 (also see the second edition). We strongly recommend both books, keeping in mind that the book by Shumway and Stoffer is much more mathematically oriented.
+
+
+# Autocovariance and autocorrelation of a time series
+
+The **autocovariance function** is defined as:
+$$\gamma_x(s, t) = \operatorname{cov}(x_s, x_t) = E\left((x_s -\mu_s)(x_t -\mu_t)\right)$$
+
++ This is Definition 1.2.in @shumwaystoffer2017.
++ It measures the linear dependence between two points in the time series. 
++ When $t = s$ it reduces to the variance of the time series. 
+
+
+The **autocorrelation function (ACF)** is
+$$
+\rho(s, t) = \dfrac{\gamma(s, t)}{\sqrt{\gamma(s, s)\,\gamma(t, t)}}
+$$
+
++ This is Definition 1.3 in @shumwaystoffer2017.
++ The ACF is bounded: $|\rho(s, t)|\leq 1$. 
++ It measures how predictable $x_t$ is when we know $x_s$. 
+
+
+# Linear Processes
+
+Definition 1.12 in @shumwaystoffer2017;  
+A **linear process** is a time series of the form:
+$$
+x_t = \mu + \sum_{j = -\infty}^{\infty}\psi_j\,w_{t - j},\text{ with }\sum_{j = -\infty}^{\infty}|\psi_j|<\infty,   \qquad\qquad\qquad\qquad (1.31)
+$$
+where the $w_{t - j}$ are white noise. 
+
+**Causality:** A general linear process depends on its future, present and past values. But in forecasting we will only consider linear processes with no dependence on the future. That is we consider processes with $\gamma_x(h) = 0$ for $h < 0$. These processes are called **causal processes**.
+
+## Covariance of Linear Combinations
+
+This is Property 1.1. in @shumwaystoffer2017. It is the foundation for many of the autocorrelation or cross correlation computations.
+
+If we have (finite variance) random variables 
+$$U = \sum_{j = 1}^m a_j X_j,\qquad V = \sum_{k = 1}^r b_k Y_kj$$
+then 
+$$\operatorname{cov}(U, V) = \sum_{j = 1}^m\sum_{k = 1}^r a_jb_k  \operatorname{cov}(X_j, Y_k)$$
+And besides
+$$\operatorname{var}(U) = \operatorname{cov}(U, U)$$
+
+The autocovariance of a linear process is (using Property 1.1):
+$$
+\gamma_x(h) = \sigma_w^2\,\sum_{j = -\infty}^{\infty}\psi_{j + h}\psi_j
+$$
+for $h > 0$ and using symmetry: $\gamma_x(-h) = \gamma_x(h)$.
+
+
+# Weak stationarity
+
+Definition 1.7 in @shumwaystoffer2017:  
+A **weakly stationary** (or, simply, a **stationary**) time series, $x_t$ has finite variance and:
+
+  (1) The mean $\mu_t = E(x_t)$ does not depend on $t$.
+  (2) The autocovariance $\gamma(s, t)$ only depends on $|s - t|$.
+
+Therefore for a stationary time series we simplify the notation to write $\mu$ and $\gamma(h)$, where $h = |s - t|$ is the time shift or **lag**. In particular, 
+$$$$
+
+## ACF in the stationary case
+
+Definition 1.7 in @shumwaystoffer2017:  
+The **autocovariance function of a stationary series** is:
+
+$$
+\gamma_x(h) = \operatorname{cov}(x_t, x_{t - h}) = E\left((x_{t} -\mu)(x_{t - h} -\mu)\right)
+$$
+
+Definition 1.9 in @shumwaystoffer2017:  
+The **autocorrelation function (ACF) of a stationary time series** is:
+$$
+\rho(h) = \dfrac{\gamma(t, t - h)}{\sqrt{\gamma(t, t)\,\gamma(t - h, t - h)}} = 
+\dfrac{\gamma(h)}{\gamma(0)}
+$$
+**Properties of the ACF of a stationary time series**
+
++ $-1\leq |\rho(h)|\leq 1 = \rho(0)$ for all $h$
++ $\rho(h) = \rho(-h)$ for all $h$.
+
+
+## References
+
+
+---
+nocite: |
+  @hyndman2021fpp3, @Krispin2019
+---
+
+

@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-09-15">
+<meta name="dcterms.date" content="2025-09-16">
 
-<title>2025_09_17 ARMA Processes, additional lecture notes</title>
+<title>2025_09_17 ARMA Processes, lecture notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -91,6 +91,35 @@ div.csl-indent {
 <link href="2025_09_17_ARMA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="2025_09_17_ARMA_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -103,14 +132,46 @@ div.csl-indent {
    
   <ul>
   <li><a href="#load-the-required-libraries" id="toc-load-the-required-libraries" class="nav-link active" data-scroll-target="#load-the-required-libraries">Load the required libraries</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#set-working-directory" id="toc-set-working-directory" class="nav-link" data-scroll-target="#set-working-directory">Set working directory</a></li>
   </ul></li>
-  <li><a href="#converting-dates-from-last-to-first-day-of-the-month-for-eda" id="toc-converting-dates-from-last-to-first-day-of-the-month-for-eda" class="nav-link" data-scroll-target="#converting-dates-from-last-to-first-day-of-the-month-for-eda">Converting dates from <em>last</em> to <em>first</em> day of the month for EDA</a></li>
-  <li><a href="#generating-ar-and-ma-time-series-from-white-noise" id="toc-generating-ar-and-ma-time-series-from-white-noise" class="nav-link" data-scroll-target="#generating-ar-and-ma-time-series-from-white-noise">Generating AR and MA time series from white noise</a>
+  <li><a href="#arma-processes" id="toc-arma-processes" class="nav-link" data-scroll-target="#arma-processes">ARMA processes</a>
+  <ul>
+  <li><a href="#autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" id="toc-autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" class="nav-link" data-scroll-target="#autoregressive-ar-process-definition-in-the-non-seasonal-regular-case">Autoregressive (AR) Process Definition in the Non Seasonal (Regular) Case</a>
   <ul class="collapse">
-  <li><a href="#white-noise-as-starting-point" id="toc-white-noise-as-starting-point" class="nav-link" data-scroll-target="#white-noise-as-starting-point">White noise as starting point</a></li>
-  <li><a href="#generating-a-pure-autoregressive-ar2-time-series" id="toc-generating-a-pure-autoregressive-ar2-time-series" class="nav-link" data-scroll-target="#generating-a-pure-autoregressive-ar2-time-series">Generating a pure autoregressive AR(2) time series</a></li>
+  <li><a href="#backshift-operator-and-characteristic-polynomial" id="toc-backshift-operator-and-characteristic-polynomial" class="nav-link" data-scroll-target="#backshift-operator-and-characteristic-polynomial">Backshift Operator and Characteristic Polynomial</a></li>
+  <li><a href="#stationarity-in-ar-processes" id="toc-stationarity-in-ar-processes" class="nav-link" data-scroll-target="#stationarity-in-ar-processes">Stationarity in AR Processes</a></li>
+  </ul></li>
+  <li><a href="#generating-a-pure-autoregressive-ar2-time-series" id="toc-generating-a-pure-autoregressive-ar2-time-series" class="nav-link" data-scroll-target="#generating-a-pure-autoregressive-ar2-time-series">Generating a pure autoregressive AR(2) time series</a>
+  <ul class="collapse">
+  <li><a href="#the-acf-and-pacf-of-a-pure-arp-model" id="toc-the-acf-and-pacf-of-a-pure-arp-model" class="nav-link" data-scroll-target="#the-acf-and-pacf-of-a-pure-arp-model">The ACF and PACF of a pure AR(p) model</a></li>
+  </ul></li>
+  <li><a href="#fitting-an-arima-model-to-this-time-series" id="toc-fitting-an-arima-model-to-this-time-series" class="nav-link" data-scroll-target="#fitting-an-arima-model-to-this-time-series">Fitting an ARIMA model to this time series</a>
+  <ul class="collapse">
+  <li><a href="#diagnose-of-the-fit.-coefficients-and-residuals." id="toc-diagnose-of-the-fit.-coefficients-and-residuals." class="nav-link" data-scroll-target="#diagnose-of-the-fit.-coefficients-and-residuals.">Diagnose of the fit. Coefficients and residuals.</a>
+  <ul class="collapse">
+  <li><a href="#residual-diagnosis" id="toc-residual-diagnosis" class="nav-link" data-scroll-target="#residual-diagnosis">Residual diagnosis</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#graphic-inspection-of-the-fitted-values" id="toc-graphic-inspection-of-the-fitted-values" class="nav-link" data-scroll-target="#graphic-inspection-of-the-fitted-values">Graphic inspection of the fitted values</a>
+  <ul>
+  <li><a href="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case" id="toc-moving-average-ma-process-definition-in-the-non-seasonal-regular-case" class="nav-link" data-scroll-target="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving Average (MA) Process Definition in the Non Seasonal (Regular) Case</a>
+  <ul class="collapse">
+  <li><a href="#moving-average-processes" id="toc-moving-average-processes" class="nav-link" data-scroll-target="#moving-average-processes">Moving Average Processes</a>
+  <ul class="collapse">
+  <li><a href="#invertibility" id="toc-invertibility" class="nav-link" data-scroll-target="#invertibility">Invertibility</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#generating-a-pure-moving-average-ma2-time-series" id="toc-generating-a-pure-moving-average-ma2-time-series" class="nav-link" data-scroll-target="#generating-a-pure-moving-average-ma2-time-series">Generating a pure moving average MA(2) time series</a></li>
+  <li><a href="#definition-of-the-armap-q-process" id="toc-definition-of-the-armap-q-process" class="nav-link" data-scroll-target="#definition-of-the-armap-q-process">Definition of the ARMA(p, q) process</a>
+  <ul class="collapse">
+  <li><a href="#an-example-of-an-armap-q-time-series" id="toc-an-example-of-an-armap-q-time-series" class="nav-link" data-scroll-target="#an-example-of-an-armap-q-time-series">An example of an ARMA(p, q) time series</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#differencing-to-remove-a-trend" id="toc-differencing-to-remove-a-trend" class="nav-link" data-scroll-target="#differencing-to-remove-a-trend">Differencing to remove a trend</a></li>
+  <li><a href="#converting-dates-from-last-to-first-day-of-the-month-for-eda" id="toc-converting-dates-from-last-to-first-day-of-the-month-for-eda" class="nav-link" data-scroll-target="#converting-dates-from-last-to-first-day-of-the-month-for-eda">Converting dates from <em>last</em> to <em>first</em> day of the month for EDA</a>
+  <ul>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
@@ -120,7 +181,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">2025_09_17 ARMA Processes, additional lecture notes</h1>
+<h1 class="title">2025_09_17 ARMA Processes, lecture notes</h1>
 </div>
 
 
@@ -131,7 +192,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 15, 2025</p>
+      <p class="date">September 16, 2025</p>
     </div>
   </div>
   
@@ -164,79 +225,43 @@ div.csl-indent {
 </div>
 </section>
 </section>
-<section id="converting-dates-from-last-to-first-day-of-the-month-for-eda" class="level1">
-<h1>Converting dates from <em>last</em> to <em>first</em> day of the month for EDA</h1>
-<p>This section solves one pending issue from previous sessions, describing an example of the kind of date/time manipulation that is often required when working with time series data.</p>
-<p>We load the data in this example, from the file <em>month_final_day.csv</em></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fdata <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"month_final_day.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">","</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        date   value
-1 1982-01-31 -1.0650
-2 1982-02-28 -1.7110
-3 1982-03-31 -0.1408
-4 1982-04-30  1.8740
-5 1982-05-31  0.6780
-6 1982-06-30 -0.1741</code></pre>
-</div>
-</div>
-<p>As you can see we have monthly data but the dates correspond to the last day of the month. That can be hard to deal with because of the irregularity in the length of the months. Therefore we convert it to first day of the month below. This conversion is <strong>purely for exploratoru purposes</strong>. <em>If the precise day of data collection is relevant in any way, you need to be extra cautious when doing this.</em></p>
-<p>First we need to acknowledge the format in the file, converting the column into a <code>date</code> object in R:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        date   value
-1 1982-01-31 -1.0650
-2 1982-02-28 -1.7110
-3 1982-03-31 -0.1408
-4 1982-04-30  1.8740
-5 1982-05-31  0.6780
-6 1982-06-30 -0.1741</code></pre>
-</div>
-</div>
-<p>Now we can use the <code>format</code> function to convert it back to character strings, but with the format of our choice. In the code below we choose to fix the <em>day</em> part of the date as <code>01</code>. But you could try things like `format = “%Y %b” (try it!) to get different results.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">format</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-01"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fdata$date &lt;- format(fdata$date, format = "%Y %b")</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        date   value
-1 1982-01-01 -1.0650
-2 1982-02-01 -1.7110
-3 1982-03-01 -0.1408
-4 1982-04-01  1.8740
-5 1982-05-01  0.6780
-6 1982-06-01 -0.1741</code></pre>
-</div>
-</div>
-<p>Note however that whatever the format you choose, we have fallen back to strings. So for the rest of the EDA we need to apply <code>as.Date</code> a second time:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">format</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        date   value
-1 1982-01-01 -1.0650
-2 1982-02-01 -1.7110
-3 1982-03-01 -0.1408
-4 1982-04-01  1.8740
-5 1982-05-01  0.6780
-6 1982-06-01 -0.1741</code></pre>
-</div>
-</div>
+<section id="arma-processes" class="level1">
+<h1>ARMA processes</h1>
+<section id="autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" class="level2">
+<h2 class="anchored" data-anchor-id="autoregressive-ar-process-definition-in-the-non-seasonal-regular-case">Autoregressive (AR) Process Definition in the Non Seasonal (Regular) Case</h2>
+<p>A stochastic process <span class="math inline">\((Y_t)\)</span> is called <strong>autoregressive</strong> if it satisfies the equation:</p>
+<p><span class="math display">\[y_{t} = \phi_{1}y_{t-1} + \phi_{2}y_{t-2} + \dots + \phi_{p}y_{t-p} + \varepsilon_{t},\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\((\varepsilon_{t})\)</span> is gaussian white noise</li>
+<li><span class="math inline">\(\phi_1, \ldots, \phi_{p}\)</span> are constants, called the <strong>coefficients</strong> of the process.</li>
+<li>The number <span class="math inline">\(p\)</span> is the <strong>order</strong> of the process, which is then called an <strong><span class="math inline">\(AR(p)\)</span> process</strong>.</li>
+</ul>
+<p>Any time series which is a realization of an autoregressive process is called an <strong>autoregressive time series</strong>.</p>
+<p>An autoregressive process can be considered as analogous to a multiple linear regression model. But here the prediction of <span class="math inline">\(y_t\)</span> uses recent lags of the time series as input variables. We regress the time series onto its recent past, and that is why we call it <strong>autoregressive</strong>.</p>
+<section id="backshift-operator-and-characteristic-polynomial" class="level4">
+<h4 class="anchored" data-anchor-id="backshift-operator-and-characteristic-polynomial">Backshift Operator and Characteristic Polynomial</h4>
+<p>Using the <strong>backshift operator</strong> <span class="math display">\[B(y_t) = y_{t - 1}\]</span></p>
+<p>we can write the autoregressive process as:</p>
+<p><span class="math display">\[\Phi(B) y_t = (1-\phi_1B - \cdots - \phi_p B^p)y_{t} = \varepsilon_{t}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\Phi(B) = (1-\phi_1B - \cdots - \phi_p B^p)\]</span></p>
+<p>is the <strong>characteristic polynomial</strong> of the process.</p>
 </section>
-<section id="generating-ar-and-ma-time-series-from-white-noise" class="level1">
-<h1>Generating AR and MA time series from white noise</h1>
-<section id="white-noise-as-starting-point" class="level2">
-<h2 class="anchored" data-anchor-id="white-noise-as-starting-point">White noise as starting point</h2>
-<p>We begin creating a gaussian white noise time series. In order to do that we get a sample of n random values from a standard normal.</p>
+<section id="stationarity-in-ar-processes" class="level4">
+<h4 class="anchored" data-anchor-id="stationarity-in-ar-processes">Stationarity in AR Processes</h4>
+<p>Not all AR processes are stationary: as we have said, a random walk is an example of AR(1) process, but we know it is not stationary. <strong>An autoregressive AR(p) process is stationary if and only if the roots of the characteristic polynomial are outside the unit circle.</strong></p>
+</section>
+</section>
+<section id="generating-a-pure-autoregressive-ar2-time-series" class="level2">
+<h2 class="anchored" data-anchor-id="generating-a-pure-autoregressive-ar2-time-series">Generating a pure autoregressive AR(2) time series</h2>
+<p><strong>White noise as starting point.</strong> We begin creating a gaussian white noise time series. In order to do that we get a sample of n random values from a standard normal.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>))</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(w, <span class="dv">25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(w, <span class="dv">25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Time Series:
 Start = 1 
@@ -249,28 +274,119 @@ Frequency = 1
 [25]  1.89519346</code></pre>
 </div>
 </div>
-</section>
-<section id="generating-a-pure-autoregressive-ar2-time-series" class="level2">
-<h2 class="anchored" data-anchor-id="generating-a-pure-autoregressive-ar2-time-series">Generating a pure autoregressive AR(2) time series</h2>
+<p>Now we can use a for loop to generate the autoregressive time series:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">1</span>] <span class="ot">&lt;-</span> w[<span class="dv">1</span>]</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="sc">-</span>phi[<span class="dv">1</span>] <span class="sc">*</span> y[<span class="dv">1</span>] <span class="sc">+</span> w[<span class="dv">2</span>]</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span>n){</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  y[t] <span class="ot">&lt;-</span> phi[<span class="dv">1</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> phi[<span class="dv">2</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">2</span>] <span class="sc">+</span> w[t]</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(y)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">1</span>] <span class="ot">&lt;-</span> w[<span class="dv">1</span>]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="sc">-</span>phi[<span class="dv">1</span>] <span class="sc">*</span> y[<span class="dv">1</span>] <span class="sc">+</span> w[<span class="dv">2</span>]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span>n){</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  y[t] <span class="ot">&lt;-</span> phi[<span class="dv">1</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> phi[<span class="dv">2</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">2</span>] <span class="sc">+</span> w[t]</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(y)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">30</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="the-acf-and-pacf-of-a-pure-arp-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-acf-and-pacf-of-a-pure-arp-model">The ACF and PACF of a pure AR(p) model</h3>
+<p>Given a time series generated by a pure AR(p) process, trying to identify the value of <span class="math inline">\(p\)</span> in the ACF is not easy. That is the reason for the use of the <strong>PACF. Partial autocorrelation</strong> measures the correlation between lagged values in a time series when we remove the influence of correlated lagged values in between.</p>
+<p>This ACF is, as we will see, typical of an stationary AR process. Note that the first ACF values drop to zero in an scillatory pattern but they do not suddenly vanish.In fact, we get <strong>three significantly different from zero coefficients.</strong> This observation will be important below in the context of identification of the right modeling strategy for our data. The pattern of the ACF looks more like a slow fading to zero. Observe also the interesting dynamics in the time plot. Both plots indicate that this is certainly not noise. To visualize more examples of this dynamics let us generate some more <strong>realizations of AR(2) processes with the same characteristic polynomial, where the only change is the noise term</strong>.</p>
+</section>
+</section>
+<section id="fitting-an-arima-model-to-this-time-series" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-an-arima-model-to-this-time-series">Fitting an ARIMA model to this time series</h2>
+<p>Now suppose that you know that the series was generated by an AR(2) process, but you don’t know the coefficients <span class="math inline">\(\phi_1, \phi_2\)</span>. The <code>Arima</code> function in the forecast library fits a model to the series, using the order:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 32</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit model with estimated order</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>arima.fit <span class="ot">&lt;-</span> <span class="fu">Arima</span>(y, <span class="at">order=</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="at">include.mean =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will discuss below the structure of this function call. The coefficients fitted for this model are <code>ar1, ar2</code> in the output of the next code line:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(arima.fit) <span class="co"># summary of training errors and estimated coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Series: y 
+ARIMA(2,0,0) with zero mean 
+
+Coefficients:
+         ar1     ar2
+      0.3330  0.4894
+s.e.  0.0276  0.0276
+
+sigma^2 = 1.008:  log likelihood = -1422.43
+AIC=2850.86   AICc=2850.88   BIC=2865.58
+
+Training set error measures:
+                      ME     RMSE       MAE      MPE     MAPE      MASE
+Training set -0.02926534 1.002945 0.7948731 689.3125 1085.457 0.7831721
+                    ACF1
+Training set 0.001491847</code></pre>
+</div>
+</div>
+<p>And you can see they are not far from the real values.</p>
+<section id="diagnose-of-the-fit.-coefficients-and-residuals." class="level3">
+<h3 class="anchored" data-anchor-id="diagnose-of-the-fit.-coefficients-and-residuals.">Diagnose of the fit. Coefficients and residuals.</h3>
+<p>The statistical theory behind the ARIMA model allows us to test if the coefficients of the fitted model are significantly different from zero (the null is <em>the coefficient is 0</em>):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 37</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(arima.fit) <span class="co"># statistical significance of estimated coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+    Estimate Std. Error z value  Pr(&gt;|z|)    
+ar1 0.333050   0.027581  12.075 &lt; 2.2e-16 ***
+ar2 0.489436   0.027589  17.740 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>The small p-values (in the column <code>Pr(&gt;|z|)</code> and indicated by the asterisks) show that this is indeed the case.</p>
+<p>Next we check for stationarity, looking at the <strong>inverse values of the roots</strong> of the characteristic polynomial.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 39</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(arima.fit) <span class="co"># root plot</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The <em>inverse</em> values are <em>inside</em> the unit circle, so that is ok.</p>
+<section id="residual-diagnosis" class="level4">
+<h4 class="anchored" data-anchor-id="residual-diagnosis">Residual diagnosis</h4>
+<p>The <strong>residuals</strong> of the model are defined as usual <span class="math display">\[
+e_t = \hat y_t - y_t
+\]</span> If the ARIMA model is a good fit for the time series, these residuals should behave like gaussian white noise. We can check that with these diagnosis plots:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 41</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check residuals</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(arima.fit, <span class="at">bins =</span> <span class="dv">100</span>, <span class="at">lags =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -278,16 +394,328 @@ Frequency = 1
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">50</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Ljung-Box test
+
+data:  Residuals from ARIMA(2,0,0) with zero mean
+Q* = 11.291, df = 8, p-value = 0.1858
+
+Model df: 2.   Total lags used: 10</code></pre>
+</div>
+</div>
+<p>The <strong>Ljung-Box</strong> hypothesis test uses the null hypothesis: <em>the residuals are white noise</em>. So if we get a low p-value that is a symptom of an unsatisfactory Arima fit.</p>
+<p>Similar plots are obtained with</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 44</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># If residuals are not white noise, change order of ARMA</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(<span class="fu">residuals</span>(arima.fit), <span class="at">lag.max =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
+</section>
+</section>
+</section>
+<section id="graphic-inspection-of-the-fitted-values" class="level1">
+<h1>Graphic inspection of the fitted values</h1>
+<p>We can also examine the fitted vs original time series for a visual check of the model fit:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Line 49</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check fitted forecast</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y, <span class="at">series =</span> <span class="st">"Real"</span>) <span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  forecast<span class="sc">::</span><span class="fu">autolayer</span>(arima.fit<span class="sc">$</span>fitted, <span class="at">series =</span> <span class="st">"Fitted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<!-- ```{r} -->
+<!-- y_lags <- ts.intersect(y, y_1 = stats::lag(y, 1), y_2 = stats::lag(y, 2)) -->
+<!-- head(y_lags) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- y_lm <- tslm(y ~ y_1 + y_2 - 1, data = y_lags) -->
+<!-- summary(y_lm) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- CheckResiduals.ICAI(residuals(y_lm)) -->
+<!-- ``` -->
+<section id="moving-average-ma-process-definition-in-the-non-seasonal-regular-case" class="level2">
+<h2 class="anchored" data-anchor-id="moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving Average (MA) Process Definition in the Non Seasonal (Regular) Case</h2>
+<section id="moving-average-processes" class="level3">
+<h3 class="anchored" data-anchor-id="moving-average-processes">Moving Average Processes</h3>
+<p>A stochastic process <span class="math inline">\((Y_t)\)</span> is called a <strong>moving average</strong> process if it satisfies the equation:</p>
+<p><span class="math display">\[y_{t} = \varepsilon_t + \theta_{1}\varepsilon_{t-1} + \theta_{2}\varepsilon_{t-2} + \cdots + \theta_{q}\varepsilon_{t-q},\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\varepsilon_{t}\)</span> is gaussian white noise</li>
+<li><span class="math inline">\(\theta_1, \ldots, \theta_{q}\)</span> are constants, called the <strong>coefficients</strong> of the process.</li>
+<li>The number <span class="math inline">\(q\)</span> is the <strong>order</strong> of the process, which is then called an <strong>MA(q) process</strong>.</li>
+</ul>
+<p>Any time series which is a realization of a moving average process is called an <strong>moving average time series</strong>.</p>
+<p>The <strong>characteristic polynomial</strong> of the MA(q) process is: <span class="math display">\[
+\Theta(B) = 1 + \theta_{1}B + \theta_{2}B^2 + \cdots + \theta_{q}B^q
+\]</span> and the MA process can be written as: <span class="math display">\[
+y_t = \Theta(B) \varepsilon_t
+\]</span></p>
+<p>The document <a href="../2025_09_10_StochasticProcess_ARMA/2025_09_10_StochasticProcess_ARMA_files/MA_examples.html">MA_examples</a> deals with real world examples of htese kind of processes.</p>
+<section id="invertibility" class="level4">
+<h4 class="anchored" data-anchor-id="invertibility">Invertibility</h4>
+<p>An <span class="math inline">\(MA(q)\)</span> process is invertible if it can be expressed as an autoregressive process <span class="math inline">\(\text{AR}(\infty)\)</span>: <span class="math display">\[
+(1 + \theta_1\, B + \theta_1^2\, B^2 + \theta_1^3\, B^2+\dots)y_t = \varepsilon_t
+\]</span></p>
+<p>MA(q) processes are invertible if <strong>the roots of the characteristic polynomial <span class="math inline">\(\Theta(B)\)</span> are all outside the unit circle of the complex plane.</strong></p>
+<p>See e.g.&nbsp;the discussion and the video in Section 9.4 of <a href="https://otexts.com/fpp3/MA.html"><span class="citation" data-cites="hyndman2021fpp3">Hyndman &amp; Athanasopoulos (<span>2021</span>)</span></a></p>
+</section>
+</section>
+</section>
+<section id="generating-a-pure-moving-average-ma2-time-series" class="level2">
+<h2 class="anchored" data-anchor-id="generating-a-pure-moving-average-ma2-time-series">Generating a pure moving average MA(2) time series</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.3</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># theta &lt;- c(0.4, 0)</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">1</span>] <span class="ot">&lt;-</span> w[<span class="dv">1</span>]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">2</span>] <span class="ot">&lt;-</span> w[<span class="dv">2</span>] <span class="sc">+</span> theta[<span class="dv">1</span>] <span class="sc">*</span> w[<span class="dv">1</span>] </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span>n){</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  y[t] <span class="ot">&lt;-</span> w[t] <span class="sc">+</span> theta[<span class="dv">1</span>] <span class="sc">*</span> w[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> theta[<span class="dv">2</span>] <span class="sc">*</span> w[t <span class="sc">-</span> <span class="dv">2</span>]</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(y)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">30</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="definition-of-the-armap-q-process" class="level2">
+<h2 class="anchored" data-anchor-id="definition-of-the-armap-q-process">Definition of the ARMA(p, q) process</h2>
+<p>An stochastic process is an <strong>ARMA(p, q) process</strong> if it satisfies the equation <span class="math display">\[
+y_{t} = \phi_{1}y_{t-1} + \cdots + \phi_{p}y_{t-p} + \theta_{1}\varepsilon_{t-1} + \cdots + \theta_{q}\varepsilon_{t-q} + \varepsilon_{t}
+\]</span> where, as usual, <span class="math inline">\(\varepsilon_{t}\)</span> is white noise, and <span class="math inline">\((p, q)\)</span> are jointly called the order of the process.</p>
+<p>The expression of the ARMA(p, q) process in terms of characteristic polynomials is: <span class="math display">\[
+\Phi(B)\,y_t = \Theta(B)\varepsilon_t
+\]</span> And the process is stationary and invertible if the roots of both <span class="math inline">\(\Phi(B)\)</span> and <span class="math inline">\(\Theta(B)\)</span> are outside the complex unit circle.</p>
+<section id="an-example-of-an-armap-q-time-series" class="level3">
+<h3 class="anchored" data-anchor-id="an-example-of-an-armap-q-time-series">An example of an ARMA(p, q) time series</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set.seed(42)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">runif</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="dv">0</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">runif</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="dv">0</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">1</span>] <span class="ot">&lt;-</span> w[<span class="dv">1</span>]</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">2</span>] <span class="ot">&lt;-</span> phi[<span class="dv">1</span>] <span class="sc">*</span> y[<span class="dv">1</span>] <span class="sc">+</span> w[<span class="dv">2</span>] <span class="sc">+</span> theta[<span class="dv">1</span>] <span class="sc">*</span> w[<span class="dv">1</span>] </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">3</span><span class="sc">:</span>n){</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  y[t] <span class="ot">&lt;-</span> phi[<span class="dv">1</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> phi[<span class="dv">2</span>] <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">2</span>] <span class="sc">+</span> w[t] <span class="sc">+</span> theta[<span class="dv">1</span>] <span class="sc">*</span> w[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> theta[<span class="dv">2</span>] <span class="sc">*</span> w[t <span class="sc">-</span> <span class="dv">2</span>]</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">ts</span>(y)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">30</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>acf_tbl <span class="ot">&lt;-</span> <span class="fu">acf</span>(y, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">30</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>pacf_tbl <span class="ot">&lt;-</span> <span class="fu">pacf</span>(y, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">lag.max =</span> <span class="fu">min</span>(n<span class="sc">/</span><span class="dv">5</span>, <span class="dv">30</span>))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(acf_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Autocorrelations of series 'y', by lag
+
+     1      2      3      4      5      6 
+ 0.608  0.169  0.100  0.041 -0.004  0.002 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pacf_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Partial autocorrelations of series 'y', by lag
+
+     1      2      3      4      5      6 
+ 0.608 -0.320  0.281 -0.244  0.180 -0.135 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="differencing-to-remove-a-trend" class="level1">
+<h1>Differencing to remove a trend</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> astsa<span class="sc">::</span>gtemp_ocean</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d1y <span class="ot">&lt;-</span> <span class="fu">diff</span>(y, <span class="at">lag =</span> <span class="dv">1</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>d1y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 1851 
+End = 2023 
+Frequency = 1 
+  [1]  0.04 -0.06  0.18  0.00 -0.04 -0.05 -0.22  0.18  0.10  0.05 -0.34  0.12
+ [13]  0.10 -0.05  0.15  0.08 -0.11  0.01  0.00  0.05 -0.02 -0.12 -0.12  0.00
+ [25]  0.12 -0.03  0.21  0.17 -0.21  0.01  0.03 -0.03 -0.13 -0.05 -0.08  0.04
+ [37] -0.06  0.06  0.27 -0.36  0.11  0.00 -0.09 -0.05  0.06  0.24  0.08 -0.30
+ [49]  0.00  0.17 -0.03 -0.13 -0.09 -0.24  0.30  0.06 -0.06 -0.17 -0.04 -0.09
+ [61]  0.03  0.35 -0.22  0.17  0.19 -0.18 -0.31  0.23  0.19 -0.13 -0.08  0.14
+ [73] -0.18  0.19 -0.17  0.17 -0.09  0.00 -0.12  0.12  0.17 -0.08 -0.10 -0.07
+ [85]  0.04  0.09  0.09 -0.03 -0.01  0.27  0.06 -0.04 -0.20  0.28 -0.11 -0.13
+ [97] -0.10 -0.10  0.13 -0.06 -0.03  0.24 -0.05 -0.13 -0.05  0.01  0.14  0.12
+[109] -0.09 -0.02  0.06 -0.03 -0.06 -0.07 -0.03  0.12 -0.05 -0.09  0.36 -0.13
+[121] -0.22  0.13  0.20 -0.32  0.11 -0.08  0.29 -0.07  0.08  0.13 -0.11 -0.07
+[133]  0.16 -0.10 -0.08  0.01  0.15  0.11 -0.21  0.18 -0.07 -0.03 -0.05  0.00
+[145]  0.11 -0.04  0.05  0.18 -0.16 -0.06  0.10  0.09 -0.03  0.00  0.00 -0.07
+[157]  0.00 -0.10  0.09  0.19 -0.20 -0.04  0.12  0.02  0.10  0.22 -0.10 -0.12
+[169]  0.11  0.09 -0.24  0.08  0.13</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(d1y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(d1y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_09_17_ARMA_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="converting-dates-from-last-to-first-day-of-the-month-for-eda" class="level1">
+<h1>Converting dates from <em>last</em> to <em>first</em> day of the month for EDA</h1>
+<p>This section solves one pending issue from previous sessions, describing an example of the kind of date/time manipulation that is often required when working with time series data.</p>
+<p>We load the data in this example, from the file <em>month_final_day.csv</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fdata <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"month_final_day.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">","</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date   value
+1 1982-01-31 -0.2729
+2 1982-02-28 -1.7150
+3 1982-03-31 -1.9920
+4 1982-04-30 -1.2720
+5 1982-05-31  0.3908
+6 1982-06-30 -0.1222</code></pre>
+</div>
+</div>
+<p>As you can see we have monthly data but the dates correspond to the last day of the month. That can be hard to deal with because of the irregularity in the length of the months. Therefore we convert it to first day of the month below. This conversion is <strong>purely for exploratoru purposes</strong>. <em>If the precise day of data collection is relevant in any way, you need to be extra cautious when doing this.</em></p>
+<p>First we need to acknowledge the format in the file, converting the column into a <code>date</code> object in R:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date   value
+1 1982-01-31 -0.2729
+2 1982-02-28 -1.7150
+3 1982-03-31 -1.9920
+4 1982-04-30 -1.2720
+5 1982-05-31  0.3908
+6 1982-06-30 -0.1222</code></pre>
+</div>
+</div>
+<p>Now we can use the <code>format</code> function to convert it back to character strings, but with the format of our choice. In the code below we choose to fix the <em>day</em> part of the date as <code>01</code>. But you could try things like `format = “%Y %b” (try it!) to get different results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">format</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-01"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fdata$date &lt;- format(fdata$date, format = "%Y %b")</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date   value
+1 1982-01-01 -0.2729
+2 1982-02-01 -1.7150
+3 1982-03-01 -1.9920
+4 1982-04-01 -1.2720
+5 1982-05-01  0.3908
+6 1982-06-01 -0.1222</code></pre>
+</div>
+</div>
+<p>Note however that whatever the format you choose, we have fallen back to strings. So for the rest of the EDA we need to apply <code>as.Date</code> a second time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>fdata<span class="sc">$</span>date <span class="ot">&lt;-</span> <span class="fu">format</span>(fdata<span class="sc">$</span>date, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        date   value
+1 1982-01-01 -0.2729
+2 1982-02-01 -1.7150
+3 1982-03-01 -1.9920
+4 1982-04-01 -1.2720
+5 1982-05-01  0.3908
+6 1982-06-01 -0.1222</code></pre>
+</div>
+</div>
 <section id="references" class="level2 unnumbered">
 
 

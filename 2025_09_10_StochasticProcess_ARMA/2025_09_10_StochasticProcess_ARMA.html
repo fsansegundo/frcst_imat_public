@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-09-09">
+<meta name="dcterms.date" content="2025-09-16">
 
 <title>2025_09_10 Stochastic Processes, ARMA Processes, lecture notes</title>
 <style>
@@ -132,22 +132,22 @@ window.Quarto = {
    
   <ul>
   <li><a href="#load-the-required-libraries" id="toc-load-the-required-libraries" class="nav-link active" data-scroll-target="#load-the-required-libraries">Load the required libraries</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#mltools-setup" id="toc-mltools-setup" class="nav-link" data-scroll-target="#mltools-setup">MLTools setup</a></li>
   <li><a href="#set-working-directory" id="toc-set-working-directory" class="nav-link" data-scroll-target="#set-working-directory">Set working directory</a></li>
   </ul></li>
   <li><a href="#white-noise" id="toc-white-noise" class="nav-link" data-scroll-target="#white-noise">White Noise</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#time-plot-of-the-white-noise-time-series" id="toc-time-plot-of-the-white-noise-time-series" class="nav-link" data-scroll-target="#time-plot-of-the-white-noise-time-series">Time plot of the white noise time series:</a></li>
   <li><a href="#acf-and-pacf-of-white-noise" id="toc-acf-and-pacf-of-white-noise" class="nav-link" data-scroll-target="#acf-and-pacf-of-white-noise">ACF and PACF of white noise</a></li>
   </ul></li>
   <li><a href="#random-walks" id="toc-random-walks" class="nav-link" data-scroll-target="#random-walks">Random walks</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#acf-and-pacf-of-random-walk" id="toc-acf-and-pacf-of-random-walk" class="nav-link" data-scroll-target="#acf-and-pacf-of-random-walk">ACF and PACF of random walk</a></li>
   </ul></li>
   <li><a href="#acf-for-a-seasonal-series" id="toc-acf-for-a-seasonal-series" class="nav-link" data-scroll-target="#acf-for-a-seasonal-series">ACF for a seasonal series</a></li>
   <li><a href="#arma-processes" id="toc-arma-processes" class="nav-link" data-scroll-target="#arma-processes">ARMA processes</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
@@ -168,7 +168,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 9, 2025</p>
+      <p class="date">September 16, 2025</p>
     </div>
   </div>
   
@@ -221,11 +221,11 @@ window.Quarto = {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(z, <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.56826778  1.02006770 -0.61295471 -0.31379532 -0.01459139 -0.57916716
- [7] -0.42448195  0.08866430 -0.35728631  0.97686752  0.16929514  1.88299787
-[13]  0.79931063 -0.37434837 -0.68498734  0.68298560  0.99611537 -0.48007449
-[19] -0.46755036 -0.12304528 -1.55003009 -0.27419408 -0.58253239  0.71268358
-[25]  0.83054202  0.74542630  0.06376583 -3.41446325  1.60521222 -0.06287682</code></pre>
+<pre><code> [1]  1.55858444  1.88605293 -0.54480851  0.09826612 -2.11960663  0.88079929
+ [7]  1.61280608  0.68176821  1.50499205 -1.32818990  0.75962654 -1.34579344
+[13]  0.49662004  2.06606039 -1.21395880  0.44334923  0.30004169 -0.03351126
+[19]  0.82571279 -0.64969804 -0.27118124  0.16515272 -0.43916555  0.14059576
+[25] -0.13853486 -0.18418089 -1.12632653 -0.94126725 -1.06966681  2.09340887</code></pre>
 </div>
 </div>
 <p>Now we use this to define a ts object. Note that now we are <strong>not</strong> providing the frequency, start, etc. In this case, the ts function will create a time index using the natural numbers t = 1, 2, 3, …</p>
@@ -237,11 +237,11 @@ window.Quarto = {
 Start = 1 
 End = 25 
 Frequency = 1 
- [1]  0.56826778  1.02006770 -0.61295471 -0.31379532 -0.01459139 -0.57916716
- [7] -0.42448195  0.08866430 -0.35728631  0.97686752  0.16929514  1.88299787
-[13]  0.79931063 -0.37434837 -0.68498734  0.68298560  0.99611537 -0.48007449
-[19] -0.46755036 -0.12304528 -1.55003009 -0.27419408 -0.58253239  0.71268358
-[25]  0.83054202</code></pre>
+ [1]  1.55858444  1.88605293 -0.54480851  0.09826612 -2.11960663  0.88079929
+ [7]  1.61280608  0.68176821  1.50499205 -1.32818990  0.75962654 -1.34579344
+[13]  0.49662004  2.06606039 -1.21395880  0.44334923  0.30004169 -0.03351126
+[19]  0.82571279 -0.64969804 -0.27118124  0.16515272 -0.43916555  0.14059576
+[25] -0.13853486</code></pre>
 </div>
 </div>
 <section id="time-plot-of-the-white-noise-time-series" class="level2">

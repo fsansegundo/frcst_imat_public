@@ -4,6 +4,7 @@ title: "2025_09_10 Stochastic Processes, ARMA Processes, lecture notes"
 format:
   html:
     toc: true
+    toc-depth: 4
 date: "`r Sys.Date()`"
 bibliography: "../forecasting.bib"
 link-citations: true 
