@@ -12,7 +12,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
 <!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
-![](QR.png){height=350px} ![ ](tucan.png){height=350px}
+![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px}
+
+## 2025-09-17 Session 
+
++ [ARMA processes, lecture notes](./2025_09_17_ARMA/2025_09_17_ARMA.html)
++ **Recommended reading:** Same as the previous lecture, plus [Ch.11 of @Krispin2019](https://github.com/PacktPublishing/Hands-On-Time-Series-Analysis-with-R). For more mathematical background [up to Ch02 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) 
+
+
 
 ## 2025-09-10 Session 
 
