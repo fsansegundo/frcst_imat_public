@@ -39,9 +39,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```
 
 
-# ARMA processes
-
-
+# Autoregressive (AR) Process
 
 ## Autoregressive (AR) Process Definition in the Non Seasonal (Regular) Case
 
@@ -244,10 +242,9 @@ autoplot(y, series = "Real") +
 <!-- CheckResiduals.ICAI(residuals(y_lm)) -->
 <!-- ``` -->
 
+# Moving Average Processes
 
-## Moving Average (MA) Process Definition in the Non Seasonal (Regular) Case
-
-### Moving Average Processes
+## Moving average (MA) process definition in the non seasonal (Regular) case
 
 A stochastic process $(Y_t)$ is called a **moving average** process if it satisfies the equation:
 
@@ -394,6 +391,7 @@ autoplot(y, series = "Real") +
   forecast::autolayer(arima.fit$fitted, series = "Fitted")
 ```
 
+# ARMA(p, q) process
 
 ## Definition of the ARMA(p, q) process
 

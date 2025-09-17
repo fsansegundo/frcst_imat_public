@@ -136,7 +136,7 @@ window.Quarto = {
   <li><a href="#load-the-required-libraries" id="toc-load-the-required-libraries" class="nav-link" data-scroll-target="#load-the-required-libraries">Load the required libraries</a></li>
   <li><a href="#set-working-directory" id="toc-set-working-directory" class="nav-link" data-scroll-target="#set-working-directory">Set working directory</a></li>
   </ul></li>
-  <li><a href="#arma-processes" id="toc-arma-processes" class="nav-link" data-scroll-target="#arma-processes">ARMA processes</a>
+  <li><a href="#autoregressive-ar-process" id="toc-autoregressive-ar-process" class="nav-link" data-scroll-target="#autoregressive-ar-process">Autoregressive (AR) Process</a>
   <ul>
   <li><a href="#autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" id="toc-autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" class="nav-link" data-scroll-target="#autoregressive-ar-process-definition-in-the-non-seasonal-regular-case">Autoregressive (AR) Process Definition in the Non Seasonal (Regular) Case</a>
   <ul class="collapse">
@@ -154,9 +154,11 @@ window.Quarto = {
   <li><a href="#residual-diagnosis" id="toc-residual-diagnosis" class="nav-link" data-scroll-target="#residual-diagnosis">Residual diagnosis</a></li>
   <li><a href="#graphic-inspection-of-the-fitted-values" id="toc-graphic-inspection-of-the-fitted-values" class="nav-link" data-scroll-target="#graphic-inspection-of-the-fitted-values">Graphic inspection of the fitted values</a></li>
   </ul></li>
-  <li><a href="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case" id="toc-moving-average-ma-process-definition-in-the-non-seasonal-regular-case" class="nav-link" data-scroll-target="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving Average (MA) Process Definition in the Non Seasonal (Regular) Case</a>
+  </ul></li>
+  <li><a href="#moving-average-processes" id="toc-moving-average-processes" class="nav-link" data-scroll-target="#moving-average-processes">Moving Average Processes</a>
+  <ul>
+  <li><a href="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case" id="toc-moving-average-ma-process-definition-in-the-non-seasonal-regular-case" class="nav-link" data-scroll-target="#moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving average (MA) process definition in the non seasonal (Regular) case</a>
   <ul class="collapse">
-  <li><a href="#moving-average-processes" id="toc-moving-average-processes" class="nav-link" data-scroll-target="#moving-average-processes">Moving Average Processes</a></li>
   <li><a href="#characteristic-polynomial" id="toc-characteristic-polynomial" class="nav-link" data-scroll-target="#characteristic-polynomial">Characteristic polynomial</a>
   <ul class="collapse">
   <li><a href="#invertibility" id="toc-invertibility" class="nav-link" data-scroll-target="#invertibility">Invertibility</a></li>
@@ -173,6 +175,9 @@ window.Quarto = {
   <li><a href="#residual-diagnosis-1" id="toc-residual-diagnosis-1" class="nav-link" data-scroll-target="#residual-diagnosis-1">Residual diagnosis</a></li>
   <li><a href="#graphic-inspection-of-the-fitted-values-1" id="toc-graphic-inspection-of-the-fitted-values-1" class="nav-link" data-scroll-target="#graphic-inspection-of-the-fitted-values-1">Graphic inspection of the fitted values</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#armap-q-process" id="toc-armap-q-process" class="nav-link" data-scroll-target="#armap-q-process">ARMA(p, q) process</a>
+  <ul>
   <li><a href="#definition-of-the-armap-q-process" id="toc-definition-of-the-armap-q-process" class="nav-link" data-scroll-target="#definition-of-the-armap-q-process">Definition of the ARMA(p, q) process</a></li>
   <li><a href="#generatig-an-armap-q-time-series" id="toc-generatig-an-armap-q-time-series" class="nav-link" data-scroll-target="#generatig-an-armap-q-time-series">Generatig an ARMA(p, q) time series</a>
   <ul class="collapse">
@@ -239,8 +244,8 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="arma-processes" class="level1">
-<h1>ARMA processes</h1>
+<section id="autoregressive-ar-process" class="level1">
+<h1>Autoregressive (AR) Process</h1>
 <section id="autoregressive-ar-process-definition-in-the-non-seasonal-regular-case" class="level2">
 <h2 class="anchored" data-anchor-id="autoregressive-ar-process-definition-in-the-non-seasonal-regular-case">Autoregressive (AR) Process Definition in the Non Seasonal (Regular) Case</h2>
 <p>A stochastic process <span class="math inline">\((Y_t)\)</span> is called <strong>autoregressive</strong> if it satisfies the equation:</p>
@@ -475,10 +480,11 @@ Model df: 2.   Total lags used: 10</code></pre>
 <!-- ``` -->
 </section>
 </section>
+</section>
+<section id="moving-average-processes" class="level1">
+<h1>Moving Average Processes</h1>
 <section id="moving-average-ma-process-definition-in-the-non-seasonal-regular-case" class="level2">
-<h2 class="anchored" data-anchor-id="moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving Average (MA) Process Definition in the Non Seasonal (Regular) Case</h2>
-<section id="moving-average-processes" class="level3">
-<h3 class="anchored" data-anchor-id="moving-average-processes">Moving Average Processes</h3>
+<h2 class="anchored" data-anchor-id="moving-average-ma-process-definition-in-the-non-seasonal-regular-case">Moving average (MA) process definition in the non seasonal (Regular) case</h2>
 <p>A stochastic process <span class="math inline">\((Y_t)\)</span> is called a <strong>moving average</strong> process if it satisfies the equation:</p>
 <p><span class="math display">\[y_{t} = \varepsilon_t + \theta_{1}\varepsilon_{t-1} + \theta_{2}\varepsilon_{t-2} + \cdots + \theta_{q}\varepsilon_{t-q},\]</span></p>
 <p>where:</p>
@@ -489,7 +495,6 @@ Model df: 2.   Total lags used: 10</code></pre>
 </ul>
 <p>Any time series which is a realization of a moving average process is called an <strong>moving average time series</strong>.</p>
 <p><strong>Note:</strong> we said before that a pure autoregressive process resembles a multilinear regression of the series on its past values. But for pure MA processes this is no longer the case: we can not regress <span class="math inline">\(y_t\)</span> on the past error terms <span class="math inline">\(\varepsilon_{t - k}\)</span> because they are unobservable (the <span class="math inline">\(\theta_k\)</span> are unknown until we fit a model).</p>
-</section>
 <section id="characteristic-polynomial" class="level3">
 <h3 class="anchored" data-anchor-id="characteristic-polynomial">Characteristic polynomial</h3>
 <p>The <strong>characteristic polynomial</strong> of the MA(q) process is: <span class="math display">\[
@@ -649,6 +654,9 @@ Model df: 2.   Total lags used: 10</code></pre>
 </div>
 </section>
 </section>
+</section>
+<section id="armap-q-process" class="level1">
+<h1>ARMA(p, q) process</h1>
 <section id="definition-of-the-armap-q-process" class="level2">
 <h2 class="anchored" data-anchor-id="definition-of-the-armap-q-process">Definition of the ARMA(p, q) process</h2>
 <p>An stochastic process is an <strong>ARMA(p, q) process</strong> if it satisfies the equation <span class="math display">\[
