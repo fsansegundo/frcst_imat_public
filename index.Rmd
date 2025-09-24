@@ -12,7 +12,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
 <!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
-![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px}
+<!-- ![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px} -->
+
+![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px} 
+
+## 2025-09-24 Session 
+
++ [ARIMA, lecture notes](./2025_09_24_ARIMA/2025_09_24_ARIMA.html)
++ **Recommended reading:** [Chapter 9 of fpp2 up to Section 9.8 (inclusive)](https://otexts.com/fpp3/arima.html#arima). Also watch the videos in that chapter.
+
+
 
 ## 2025-09-17 Session 
 
