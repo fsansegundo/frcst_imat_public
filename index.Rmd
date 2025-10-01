@@ -13,12 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px} -->
+<!-- ![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px}  -->
+![](QR.png){height=350px} ![ ](GarcillaCangrejera.jpg){height=350px} 
 
-![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px} 
-## 
 
-+
-+ For this session we recommend [Sections 5.8 to 5.10 of @hyndman2021fpp3](https://otexts.com/fpp3/accuracy.html#accuracy) and the corresponding videos. The code for those sections uses a more advanced R syntax than our lab code, but the results are essentially the same. 
+
+## 2025-10-01 Session 
+
++ <span style="color:red;font-weight: bold">Última semana para apuntarse</span> al [Acto de la Cátedra Endesa de Aplicaciones de la IA (21/10/2025)](https://sifo.comillas.edu/mod/url/view.php?id=3744630)
++ [SARIMA, lecture notes](./2025_10_01_SARIMA/2025_10_01_SARIMA.html)
++ **Recommended reading:**  [Sections 5.8 to 5.10 of @hyndman2021fpp3](https://otexts.com/fpp3/accuracy.html#accuracy) and the corresponding videos. The code for those sections uses a more advanced R syntax than our lab code, but the results are essentially the same. 
 
 
 ## 2025-09-24 Session 
