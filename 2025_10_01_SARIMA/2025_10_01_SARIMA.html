@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-09-30">
+<meta name="dcterms.date" content="2025-10-01">
 
 <title>2025_09_24 ARIMA, lecture notes</title>
 <style>
@@ -194,7 +194,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 30, 2025</p>
+      <p class="date">October 1, 2025</p>
     </div>
   </div>
   
@@ -780,8 +780,9 @@ z_t = z_t = z_{t-1} + z_{t-12} - z_{t-13} +
 \epsilon_t = z_t - z_{t-1} - z_{t-12} + z_{t-13} -
 \phi_1 (z_{t-12} - z_{t-13} - z_{t-24} + z_{t-25}) - \\
 \theta_1 \epsilon_{t-1} - \Theta_1 \epsilon_{t-12} - \theta_1 \Theta_1 \epsilon_{t-13}
-\]</span> The right hand side of these equation only contains lags of <span class="math inline">\(z_t\)</span> and <span class="math inline">\(\epsilon_t\)</span>. <a href="https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting">Section 9.8 of <span class="citation" data-cites="hyndman2021fpp3">Hyndman &amp; Athanasopoulos (<span>2021</span>)</span></a> explains how to apply this forecasting equations. In summary: when you start forecasting the first values you replace past values of <span class="math inline">\(z\)</span> with training set values and <span class="math inline">\(\epsilon\)</span> values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of <span class="math inline">\(z\)</span> and <span class="math inline">\(\epsilon\)</span> will be needed. The difference between <code>forecast</code> and the validation loop is in deciding what values we use for <span class="math inline">\(z\)</span> and <span class="math inline">\(\epsilon\)</span> for <span class="math inline">\(t\)</span> values corresponding to the test set. Let us explore this in the code.</p>
-<p>So we begin by splitting z into training and test. <strong>Technical note:</strong> Lambda was determined using only the training set, and we apply the same Lambda to the test set to prevent data leakage.</p>
+\]</span> <a href="https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting">Section 9.8 of <span class="citation" data-cites="hyndman2021fpp3">Hyndman &amp; Athanasopoulos (<span>2021</span>)</span></a> explains how to apply this forecasting equations. In summary: + When you start forecasting the first values you replace past values of <span class="math inline">\(z\)</span> with training set values and <span class="math inline">\(\epsilon\)</span> values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of <span class="math inline">\(z\)</span> and <span class="math inline">\(\epsilon\)</span> will be needed. + Note that in order to compute <span class="math inline">\(z_t\)</span> using the first equation we need <span class="math inline">\(\epsilon_t\)</span>, so we assume that value to be zero. + The main difference between <code>forecast</code> and the validation loop is in deciding whether we then use the second equation to update <span class="math inline">\(\epsilon_t\)</span> for <span class="math inline">\(t\)</span> values corresponding to the test set. Let us explore this in the code.</p>
+<p>So we begin by splitting z into training and test.</p>
+<p><strong>Technical note:</strong> Lambda was determined using only the training set, and we apply the same Lambda to the test set to prevent data leakage.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">BoxCox</span>(y, Lambda)</span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>z.TR <span class="ot">&lt;-</span> <span class="fu">subset</span>(z, <span class="at">end =</span> <span class="fu">length</span>(y.TR))</span>

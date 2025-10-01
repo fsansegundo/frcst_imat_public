@@ -462,18 +462,13 @@ $$
 \phi_1 (z_{t-12} - z_{t-13} - z_{t-24} + z_{t-25}) - \\
 \theta_1 \epsilon_{t-1} - \Theta_1 \epsilon_{t-12} - \theta_1 \Theta_1 \epsilon_{t-13}
 $$
-The right hand side of these equation only contains lags of $z_t$ and
-$\epsilon_t$. [Section 9.8 of @hyndman2021fpp3](https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting)
-explains how to apply this forecasting equations. In summary: when you start
-forecasting the first values you replace past values of $z$ with training
-set values and $\epsilon$ values with the residuals of the fitted model
-(also corresponding to training). As you move further into the test set,
-unknown values of $z$ and $\epsilon$ will be needed.
-The difference between `forecast` and the validation loop is in deciding what
-values we use for $z$ and $\epsilon$ for $t$ values corresponding to
-the test set. Let us explore this in the code.
+[Section 9.8 of @hyndman2021fpp3](https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting) explains how to apply this forecasting equations. In summary: 
++ When you start forecasting the first values you replace past values of $z$ with training set values and $\epsilon$ values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of $z$ and $\epsilon$ will be needed. 
++ Note that in order to compute $z_t$ using the first equation we need $\epsilon_t$, so we assume that value to be zero. 
++ The main difference between `forecast` and the validation loop is in deciding whether we then use the second equation to update $\epsilon_t$ for $t$ values corresponding to the test set. Let us explore this in the code.
 
 So we begin by splitting z into training and test.
+
 **Technical note:** Lambda was determined using only the training set, and
 we apply the same Lambda to the test set to prevent data leakage.
 
@@ -516,26 +511,18 @@ CheckResiduals.ICAI(arima.fit, bins = 100, lag=100)
 
 Now let us begin using this model to forecast the test set values.
 
-We begin by using the `forecast` function to forecast **all the values** in
-the test set. That is, we set the forecasting horizon h equal to the length
-of the test set,
+We begin by using the `forecast` function to forecast **all the values** in the test set. That is, we set the forecasting horizon h equal to the length of the test set,
 
 ```{r fig.width=12, fig.height=8}
 z_est <- forecast::forecast(arima.fit, h=length(z.TV))
 ```
 
-Next we will generate three additional versions of the forecasts, using a
-loop as we did before.
+Next we will generate three additional versions of the forecasts, using a loop as we did before.
 
-+ The first forecast `z.TV.est` is exactly what we did before, but using
-z instead of y.
-+ The second one `z.TV.est2` will use the two forecasting equations (with the
-fitted coefficients) and will always use **actual values** of $z_t$ in the
-test set. The error terms will also be updated with the second forecasting
++ The first forecast `z.TV.est` is exactly what we did before, but using z instead of y.
++ The second one `z.TV.est2` will use the two forecasting equations (with the fitted coefficients) and will always use **actual values** of $z_t$ in the test set. The error terms will also be updated with the second forecasting
 equation.
-+ The third one `z.TV.est3` will also use the forecasting equation, but it
-will use its own **forecasted values** of $z_t$ in the test set. The error terms
-for $t$ in the test set will all be set to zero.
++ The third one `z.TV.est3` will also use the forecasting equation, but it will use its own **forecasted values** of $z_t$ in the test set. The error terms for $t$ in the test set will all be set to zero.
 
 First we create empty time series to store the different forecasts.
 
