@@ -1,5 +1,5 @@
 ---
-title: "2025_09_24 ARIMA, lecture notes"
+title: "2025_09_24 SARIMA, lecture notes"
 # output: html_document
 format:
   html:
@@ -463,6 +463,7 @@ $$
 \theta_1 \epsilon_{t-1} - \Theta_1 \epsilon_{t-12} - \theta_1 \Theta_1 \epsilon_{t-13}
 $$
 [Section 9.8 of @hyndman2021fpp3](https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting) explains how to apply this forecasting equations. In summary: 
+
 + When you start forecasting the first values you replace past values of $z$ with training set values and $\epsilon$ values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of $z$ and $\epsilon$ will be needed. 
 + Note that in order to compute $z_t$ using the first equation we need $\epsilon_t$, so we assume that value to be zero. 
 + The main difference between `forecast` and the validation loop is in deciding whether we then use the second equation to update $\epsilon_t$ for $t$ values corresponding to the test set. Let us explore this in the code.

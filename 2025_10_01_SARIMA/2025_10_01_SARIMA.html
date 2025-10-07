@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-10-01">
+<meta name="dcterms.date" content="2025-10-07">
 
-<title>2025_09_24 ARIMA, lecture notes</title>
+<title>2025_09_24 SARIMA, lecture notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -183,7 +183,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">2025_09_24 ARIMA, lecture notes</h1>
+<h1 class="title">2025_09_24 SARIMA, lecture notes</h1>
 </div>
 
 
@@ -194,7 +194,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 1, 2025</p>
+      <p class="date">October 7, 2025</p>
     </div>
   </div>
   
@@ -780,7 +780,12 @@ z_t = z_t = z_{t-1} + z_{t-12} - z_{t-13} +
 \epsilon_t = z_t - z_{t-1} - z_{t-12} + z_{t-13} -
 \phi_1 (z_{t-12} - z_{t-13} - z_{t-24} + z_{t-25}) - \\
 \theta_1 \epsilon_{t-1} - \Theta_1 \epsilon_{t-12} - \theta_1 \Theta_1 \epsilon_{t-13}
-\]</span> <a href="https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting">Section 9.8 of <span class="citation" data-cites="hyndman2021fpp3">Hyndman &amp; Athanasopoulos (<span>2021</span>)</span></a> explains how to apply this forecasting equations. In summary: + When you start forecasting the first values you replace past values of <span class="math inline">\(z\)</span> with training set values and <span class="math inline">\(\epsilon\)</span> values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of <span class="math inline">\(z\)</span> and <span class="math inline">\(\epsilon\)</span> will be needed. + Note that in order to compute <span class="math inline">\(z_t\)</span> using the first equation we need <span class="math inline">\(\epsilon_t\)</span>, so we assume that value to be zero. + The main difference between <code>forecast</code> and the validation loop is in deciding whether we then use the second equation to update <span class="math inline">\(\epsilon_t\)</span> for <span class="math inline">\(t\)</span> values corresponding to the test set. Let us explore this in the code.</p>
+\]</span> <a href="https://otexts.com/fpp3/arima-forecasting.html#arima-forecasting">Section 9.8 of <span class="citation" data-cites="hyndman2021fpp3">Hyndman &amp; Athanasopoulos (<span>2021</span>)</span></a> explains how to apply this forecasting equations. In summary:</p>
+<ul>
+<li>When you start forecasting the first values you replace past values of <span class="math inline">\(z\)</span> with training set values and <span class="math inline">\(\epsilon\)</span> values with the residuals of the fitted model (also corresponding to training). As you move further into the test set, unknown values of <span class="math inline">\(z\)</span> and <span class="math inline">\(\epsilon\)</span> will be needed.</li>
+<li>Note that in order to compute <span class="math inline">\(z_t\)</span> using the first equation we need <span class="math inline">\(\epsilon_t\)</span>, so we assume that value to be zero.</li>
+<li>The main difference between <code>forecast</code> and the validation loop is in deciding whether we then use the second equation to update <span class="math inline">\(\epsilon_t\)</span> for <span class="math inline">\(t\)</span> values corresponding to the test set. Let us explore this in the code.</li>
+</ul>
 <p>So we begin by splitting z into training and test.</p>
 <p><strong>Technical note:</strong> Lambda was determined using only the training set, and we apply the same Lambda to the test set to prevent data leakage.</p>
 <div class="cell">
