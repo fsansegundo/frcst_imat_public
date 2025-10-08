@@ -14,13 +14,28 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px}  -->
-![](QR.png){height=350px} ![ ](GarcillaCangrejera.jpg){height=350px} 
+<!-- ![](QR.png){height=350px} ![ ](GarcillaCangrejera.jpg){height=350px}  -->
+<!-- ![](QR.png){height=350px} ![ ](Calamon-20110126-DSC_0094a.jpeg){height=350px} -->
+![](QR.png){height=350px} ![ ](./Trepador.png){height=350px}
+
+
+
+## 2025-10-22 Session
+
+
++ [Splits in Forecasting (via the Python `sktime` lbrary)](https://www.sktime.net/en/v0.24.2/examples/forecasting/window_splitters.html)
+
+## 2025-10-08 Session 
+
++ <span style="color:red">Midterm 2023 statement available in Moodle</span>
++ [Dynamic Regression models](./2025_10_08_TransferFunctions_1/2025_10_08_Dynamic_Regression_1.html)
++ **Recommended reading:**  [Chapter 10 of @hyndman2021fpp3](https://otexts.com/fpp3/dynamic.html) and the corresponding videos. [Chapter 9 in @hyndman2021fpp2] covers the same ideas, but using previous versions of the R libraries, you may find it useful as well. [Section 5.5 of @shumwaystoffer2017](https://link.springer.com/book/10.1007/978-3-319-52452-8) deals with *Transfer Function Modeling*, but to read it you need the previous chapters material.
 
 
 
 ## 2025-10-01 Session 
 
-+ <span style="color:red;font-weight: bold">Última semana para apuntarse</span> al [Acto de la Cátedra Endesa de Aplicaciones de la IA (21/10/2025)](https://sifo.comillas.edu/mod/url/view.php?id=3744630)
++ <span style="color:red">Última semana para apuntarse</span> al [Acto de la Cátedra Endesa de Aplicaciones de la IA (21/10/2025)](https://sifo.comillas.edu/mod/url/view.php?id=3744630)
 + [SARIMA, lecture notes](./2025_10_01_SARIMA/2025_10_01_SARIMA.html)
 + **Recommended reading:**  [Sections 5.8 to 5.10 of @hyndman2021fpp3](https://otexts.com/fpp3/accuracy.html#accuracy) and the corresponding videos. The code for those sections uses a more advanced R syntax than our lab code, but the results are essentially the same. 
 

@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Análisis y Predicción de Series Temporales, 3º B IMAT">
+<meta name="dcterms.date" content="2025-10-08">
+
+<title>Lab. 7 Dynamic regression models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/popper.min.js"></script>
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="2025_10_08_Dynamic_Regression_1_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="2025_10_08_Dynamic_Regression_1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="2025_10_08_Dynamic_Regression_1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="2025_10_08_Dynamic_Regression_1_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#preliminaries" id="toc-preliminaries" class="nav-link active" data-scroll-target="#preliminaries">Preliminaries</a>
+  <ul>
+  <li><a href="#set-working-directory" id="toc-set-working-directory" class="nav-link" data-scroll-target="#set-working-directory">Set working directory</a></li>
+  </ul></li>
+  <li><a href="#transfer-function-examples" id="toc-transfer-function-examples" class="nav-link" data-scroll-target="#transfer-function-examples">Transfer Function Examples</a>
+  <ul>
+  <li><a href="#first-example" id="toc-first-example" class="nav-link" data-scroll-target="#first-example">First example</a>
+  <ul class="collapse">
+  <li><a href="#generate-random-explanatory-variable" id="toc-generate-random-explanatory-variable" class="nav-link" data-scroll-target="#generate-random-explanatory-variable">Generate random explanatory variable</a>
+  <ul class="collapse">
+  <li><a href="#cross-correlation-function" id="toc-cross-correlation-function" class="nav-link" data-scroll-target="#cross-correlation-function">Cross-correlation function</a></li>
+  <li><a href="#classical-linear-regression-model" id="toc-classical-linear-regression-model" class="nav-link" data-scroll-target="#classical-linear-regression-model">Classical linear regression model</a></li>
+  <li><a href="#transfer-function-model" id="toc-transfer-function-model" class="nav-link" data-scroll-target="#transfer-function-model">Transfer function model</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#second-example" id="toc-second-example" class="nav-link" data-scroll-target="#second-example">Second example</a>
+  <ul class="collapse">
+  <li><a href="#cross-correlation-function-1" id="toc-cross-correlation-function-1" class="nav-link" data-scroll-target="#cross-correlation-function-1">Cross-correlation function</a></li>
+  <li><a href="#classical-linear-regression-model-1" id="toc-classical-linear-regression-model-1" class="nav-link" data-scroll-target="#classical-linear-regression-model-1">Classical linear regression model</a></li>
+  <li><a href="#transfer-function-model-1" id="toc-transfer-function-model-1" class="nav-link" data-scroll-target="#transfer-function-model-1">Transfer function model</a></li>
+  <li><a href="#diagnosis" id="toc-diagnosis" class="nav-link" data-scroll-target="#diagnosis">Diagnosis</a></li>
+  </ul></li>
+  <li><a href="#third-example" id="toc-third-example" class="nav-link" data-scroll-target="#third-example">Third example</a>
+  <ul class="collapse">
+  <li><a href="#cross-correlation-function-2" id="toc-cross-correlation-function-2" class="nav-link" data-scroll-target="#cross-correlation-function-2">Cross-correlation function</a></li>
+  <li><a href="#transfer-function-model-2" id="toc-transfer-function-model-2" class="nav-link" data-scroll-target="#transfer-function-model-2">Transfer function model</a></li>
+  <li><a href="#diagnosis-1" id="toc-diagnosis-1" class="nav-link" data-scroll-target="#diagnosis-1">Diagnosis</a></li>
+  <li><a href="#prewhitening" id="toc-prewhitening" class="nav-link" data-scroll-target="#prewhitening">Prewhitening</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab. 7 Dynamic regression models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Análisis y Predicción de Series Temporales, 3º B IMAT </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 8, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="preliminaries" class="level1">
+<h1>Preliminaries</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MLTools)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fpp2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmtest)  </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tseries) </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TSstudio)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(astsa)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TSA)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Hmisc) <span class="co"># for computing lagged variables</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="set-working-directory" class="level3">
+<h3 class="anchored" data-anchor-id="set-working-directory">Set working directory</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="fu">dirname</span>(rstudioapi<span class="sc">::</span><span class="fu">getActiveDocumentContext</span>()<span class="sc">$</span>path))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="transfer-function-examples" class="level1">
+<h1>Transfer Function Examples</h1>
+<p>We will generate some examples following Pankratz’s formulation of dynamic regression models: <span class="math display">\[y[t] = c + \dfrac{\omega(B)}{\delta(B)} x[t - b] + v(t)\]</span> where <span class="math inline">\(y\)</span> is the output variable, <span class="math inline">\(x\)</span> is the input and <span class="math inline">\(v\)</span> is the autocorrelated ARMA noise.</p>
+<section id="first-example" class="level2">
+<h2 class="anchored" data-anchor-id="first-example">First example</h2>
+<p>For the first example let the input variable x1 be white noise.</p>
+<section id="generate-random-explanatory-variable" class="level3">
+<h3 class="anchored" data-anchor-id="generate-random-explanatory-variable">Generate random explanatory variable</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2024</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="fu">ts</span>(x1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(x1, <span class="at">lag.max =</span> <span class="dv">100</span>, <span class="at">main =</span> <span class="st">"x1"</span>, <span class="at">plot.type =</span> <span class="st">"histogram"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We also simulate the <strong>ARMA noise</strong> <span class="math inline">\(v(t)\)</span>. (try to simulate 10 * N samples and compare ACF).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ar_noise <span class="ot">&lt;-</span> <span class="fu">arima.sim</span>(<span class="at">n =</span> N, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">list</span>(<span class="at">ar =</span> <span class="fu">c</span>(<span class="fl">0.8</span>)),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.25</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(ar_noise,<span class="at">lag.max =</span> <span class="dv">100</span>, <span class="at">main =</span> <span class="st">"ARMA noise"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Exercise:</strong> are the ACF and PACF what you expected?</p>
+<p>Next we generate the output <span class="math inline">\(y1\)</span> following a very simple example of Pankratz’s model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fl">0.7</span> <span class="sc">*</span> x1 <span class="sc">+</span> ar_noise</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Exercise:</strong></p>
+<ul>
+<li>What is <span class="math inline">\(\omega(B)\)</span> here, what is its degree <span class="math inline">\(s\)</span>?</li>
+<li>What is <span class="math inline">\(\delta(B)\)</span> here, what is its degree <span class="math inline">\(r\)</span>?</li>
+<li>What is the lag <span class="math inline">\(b\)</span>? What about <span class="math inline">\(c\)</span>?</li>
+</ul>
+<p>Next we create a multidimensional time series with these variables: input, output and noise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fdata1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x1, y1, <span class="at">n=</span>ar_noise)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 1 
+End = 6 
+Frequency = 1 
+          x1          y1          n
+1  0.9819694  0.02059515 -0.6667834
+2  0.4687150 -0.08178823 -0.4098888
+3 -0.1079713 -0.44904772 -0.3734678
+4 -0.2128782  0.43089886  0.5799136
+5  1.1580985  1.20563498  0.3949661
+6  1.2923548  1.16502449  0.2603761</code></pre>
+</div>
+</div>
+<section id="cross-correlation-function" class="level4">
+<h4 class="anchored" data-anchor-id="cross-correlation-function">Cross-correlation function</h4>
+<p>In order to explore the correlation between one time series y and the lags of another time series x we can use this <em>cross correlation function</em> <code>ccf(y, x)</code>. For example, the first lag of the time series x1 is (trivially) perfectly correlated with x1. Let us explore this with ccf:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x1_lag1 <span class="ot">&lt;-</span> <span class="fu">Lag</span>(x1, <span class="at">shift =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This <code>Lag</code> function (from Hmisc) is different from the <code>lag</code> function (from stats) that we have used in previous sessions. It keeps the origin of the time series but fills the lagged positions with NAs.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x1_lag1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 1 
+End = 6 
+Frequency = 1 
+[1]         NA  0.9819694  0.4687150 -0.1079713 -0.2128782  1.1580985</code></pre>
+</div>
+</div>
+<p>We fill that missing value with zero.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x1_lag1[<span class="fu">is.na</span>(x1_lag1)] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Exercise:</strong> Look at the value of <code>Start</code> in the previous output. Now run<br>
+<code>stats::lag(x1)</code> and compare the output.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(stats<span class="sc">::</span><span class="fu">lag</span>(x1, <span class="at">n =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 0 
+End = 5 
+Frequency = 1 
+[1]  0.9819694  0.4687150 -0.1079713 -0.2128782  1.1580985  1.2923548</code></pre>
+</div>
+</div>
+<p>Now we can plot the ccf values. We use <code>abline</code> to add some red dashed lines to help you identify the first lags (on both sides of zero)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> x1, <span class="at">x =</span> x1_lag1)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Alternatively, you can use this (without setting the NAs to 0)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> x1, <span class="at">x =</span> <span class="fu">Lag</span>(x1, <span class="at">shift =</span> <span class="dv">1</span>), <span class="at">na.action =</span> na.pass)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Either way, the ccf plot shows that (as expected) x1(t) has cross correlation equal to 1 with its lag x1(t - 1).</p>
+<p><strong>Notes about ccf:</strong></p>
+<ul>
+<li>In general <strong>the lag k value returned by <code>ccf(x, y)</code> estimates the correlation between <code>x[t+k]</code> and <code>y[t]</code></strong>. When you apply it to the lag of x1, that is when <code>y[t] = x1[t]</code> and <code>x[t] = x1[t - 1]</code> then the value k units to the right shows the correlation between <code>x1[t - 1 + k]</code> and <code>x1[t]</code>. In this example, where x1 is white noise the ony non-zero value occurs at k = 1.</li>
+<li>You can use <code>print(ccf(...))</code> to see the numeric values of the ccf</li>
+</ul>
+<p>If we use <code>ccf</code> to explore the cross correlation between the output and input of this example we get a clear indication that they are correlated for t = 0. This is a consequence of the equation model, but the (lack of) autocorrelation of x1 also plays a role here.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> y1, <span class="at">x =</span> x1)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="classical-linear-regression-model" class="level4">
+<h4 class="anchored" data-anchor-id="classical-linear-regression-model">Classical linear regression model</h4>
+<p>If we try to study the relation of x1 and y1 with a classical (non dynamic) linear regression model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>lm1.fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y1 <span class="sc">~</span> x1 <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> fdata1 )</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm1.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y1 ~ x1 - 1, data = fdata1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.32756 -0.60451 -0.01213  0.42890  1.68936 
+
+Coefficients:
+   Estimate Std. Error t value Pr(&gt;|t|)    
+x1  0.65637    0.03441   19.07   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7478 on 499 degrees of freedom
+Multiple R-squared:  0.4216,    Adjusted R-squared:  0.4205 
+F-statistic: 363.8 on 1 and 499 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>You can see that even though the model coefficient is significant, the residuals of the model do not look like white noise:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(lm1.fit, <span class="at">lag=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Breusch-Godfrey test for serial correlation of order up to 100
+
+data:  Residuals
+LM test = 306.02, df = 100, p-value &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Therefore this model fails to extract all the information about y1. However, in this example there is no cross correlation between the residuals of the model and x1 (recall x1 is white noise, so it has no autocorrelation).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> <span class="fu">residuals</span>(lm1.fit), <span class="at">x =</span> x1)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="transfer-function-model" class="level4">
+<h4 class="anchored" data-anchor-id="transfer-function-model">Transfer function model</h4>
+<p>Let us return to the Pankratz’s transfer function model connecting x1, y1 and the ARMA noise. In order to fit this type of model we again use an <code>arima</code> function, but this one belongs to the TSA library:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>arima1.fit <span class="ot">&lt;-</span> TSA<span class="sc">::</span><span class="fu">arima</span>(y1,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                    <span class="co">#seasonal = list(order=c(0,0,0),period=24),</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xtransf =</span> x1, <span class="co"># input variable(s)</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">transfer =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)), <span class="co"># values of r and s</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">include.mean =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method=</span><span class="st">"ML"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Note the xtransf and transfer arguments.</strong> We will use this arguments of the function to describe the components of the Pankratz’s formulation of this model. Do not worry if you do not understand this function right away, we will see the details in coming examples.</p>
+<p>The <strong>diagnosis</strong> of these models shares some aspects of the SARIMA model diagnosis we have discussed.</p>
+<p>We begin by examining the summary of training errors and the significance of the estimated coefficients</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(arima1.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+TSA::arima(x = y1, order = c(1, 0, 0), include.mean = FALSE, method = "ML", 
+    xtransf = x1, transfer = list(c(0, 0)))
+
+Coefficients:
+         ar1  T1-MA0
+      0.7330  0.6982
+s.e.  0.0304  0.0187
+
+sigma^2 estimated as 0.2589:  log likelihood = -372.01,  aic = 748.02
+
+Training set error measures:
+                      ME      RMSE       MAE      MPE     MAPE      MASE
+Training set -0.02265786 0.5088067 0.3977492 159.3794 325.3977 0.4486936
+                    ACF1
+Training set -0.01465217</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(arima1.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+       Estimate Std. Error z value  Pr(&gt;|z|)    
+ar1    0.732958   0.030377  24.129 &lt; 2.2e-16 ***
+T1-MA0 0.698220   0.018653  37.432 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Note that the table now includes information about the coefficients of the transfer function: <code>T1-MA0</code> here.</p>
+<p>Next we check if the residuals look like white noise</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(arima1.fit, <span class="at">lag=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Ljung-Box test
+
+data:  Residuals from ARIMA(1,0,0) with zero mean
+Q* = 102.24, df = 98, p-value = 0.3647
+
+Model df: 2.   Total lags used: 100</code></pre>
+</div>
+</div>
+<p>Notice that they do, in contrast with the classical linear model.</p>
+<p>Finally, there is a <strong>new step in the diagnosis of the model: the ccf of the input with the residuals</strong>. If the model is well fitted there should be no cross correlation left (as in this case).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> <span class="fu">residuals</span>(arima1.fit), <span class="at">x =</span> x1)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="second-example" class="level2">
+<h2 class="anchored" data-anchor-id="second-example">Second example</h2>
+<p>For our second example we will keep the ARMA noise term, but we will consider an input time series with autocorrelation, as illustrated by the ACF plot below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"TEMP.dat"</span>, <span class="at">sep =</span> <span class="st">""</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">ts</span>(x2<span class="sc">$</span>TEMP)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(x2,<span class="at">lag.max =</span> <span class="dv">100</span>, <span class="at">main =</span> <span class="st">"x2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We create the output variable y2 as before.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">&lt;-</span> <span class="fl">0.7</span> <span class="sc">*</span> x2 <span class="sc">+</span> ar_noise</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Exercise:</strong> Ask yourself the same questions as in the previous example. That is , think about <span class="math inline">\(\omega(B)\)</span> and its degree <span class="math inline">\(s\)</span>, about <span class="math inline">\(\delta(B)\)</span> and its degree <span class="math inline">\(r\)</span> and also about the lag <span class="math inline">\(b\)</span>.</p>
+<p>We again create a multidimensional time series with these variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>fdata2 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x2, y2, <span class="at">n=</span>ar_noise)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 1 
+End = 6 
+Frequency = 1 
+   x2       y2          n
+1 9.6 6.053217 -0.6667834
+2 7.0 4.490111 -0.4098888
+3 8.8 5.786532 -0.3734678
+4 8.6 6.599914  0.5799136
+5 7.4 5.574966  0.3949661
+6 8.8 6.420376  0.2603761</code></pre>
+</div>
+</div>
+<section id="cross-correlation-function-1" class="level3">
+<h3 class="anchored" data-anchor-id="cross-correlation-function-1">Cross-correlation function</h3>
+<p>If we examine the ccf between the input x2 and the output we get a much more complicated picture:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> y2, <span class="at">x =</span> x2)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Exercise:</strong> Why? What is different in this example?</p>
+</section>
+<section id="classical-linear-regression-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="classical-linear-regression-model-1">Classical linear regression model</h3>
+<p>And if we apply a classical linear regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>lm2.fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y2 <span class="sc">~</span> x2 <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> fdata2 )</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm2.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = y2 ~ x2 - 1, data = fdata2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.2700 -0.5594  0.0352  0.4707  1.7267 
+
+Coefficients:
+   Estimate Std. Error t value Pr(&gt;|t|)    
+x2 0.695501   0.002453   283.5   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7465 on 499 degrees of freedom
+Multiple R-squared:  0.9938,    Adjusted R-squared:  0.9938 
+F-statistic: 8.037e+04 on 1 and 499 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Then the residuals still do not look as they should</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(lm2.fit, <span class="at">lag=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Breusch-Godfrey test for serial correlation of order up to 100
+
+data:  Residuals
+LM test = 306.98, df = 100, p-value &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>But we have an additional problem. There is cross correlation between the residuals and the input:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> <span class="fu">residuals</span>(lm2.fit), <span class="at">x =</span> x2)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="transfer-function-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="transfer-function-model-1">Transfer function model</h3>
+<p>To address the shortcomings of classical linear regression we fit a transfer function model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>arima2.fit <span class="ot">&lt;-</span> <span class="fu">arima</span>(y2,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xtransf =</span> x2,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">transfer =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)), <span class="co"># values of r and s</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">include.mean =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method=</span><span class="st">"ML"</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(arima2.fit) <span class="co"># summary of training errors and estimated coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+arima(x = y2, order = c(1, 0, 0), include.mean = FALSE, method = "ML", xtransf = x2, 
+    transfer = list(c(0, 0)))
+
+Coefficients:
+         ar1  T1-MA0
+      0.7313  0.6959
+s.e.  0.0305  0.0054
+
+sigma^2 estimated as 0.2586:  log likelihood = -371.73,  aic = 747.47
+
+Training set error measures:
+                       ME      RMSE       MAE       MPE     MAPE     MASE
+Training set -0.009103546 0.5085285 0.3976666 -6.492557 12.52274 0.297069
+                    ACF1
+Training set -0.01238152</code></pre>
+</div>
+</div>
+<p>Again, do not worry if you do not understand all the details just yet.</p>
+</section>
+<section id="diagnosis" class="level3">
+<h3 class="anchored" data-anchor-id="diagnosis">Diagnosis</h3>
+<p>For the diagnosis we check the <strong>significance of the coefficients</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(arima2.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+       Estimate Std. Error z value  Pr(&gt;|z|)    
+ar1    0.731318   0.030451  24.016 &lt; 2.2e-16 ***
+T1-MA0 0.695912   0.005441 127.901 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>We check if the <strong>residuals look like gaussian white noise</strong> (see the Ljung-Box test result)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(arima2.fit, <span class="at">lag=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Ljung-Box test
+
+data:  Residuals from ARIMA(1,0,0) with zero mean
+Q* = 101.7, df = 98, p-value = 0.3788
+
+Model df: 2.   Total lags used: 100</code></pre>
+</div>
+</div>
+<p>And finally we <strong>check the cross correlation between the residuals and the input</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> <span class="fu">residuals</span>(arima2.fit), <span class="at">x =</span> x2)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As you can see, this model passes all our checks.</p>
+<p><strong>Exercise:</strong> Go back to the first example and check the code line defining the model to a new output:</p>
+<p><code>y3 &lt;-  70 * x1 + ar_noise</code></p>
+<p>What changes do you expect in the model? Run the code and see what happens.</p>
+</section>
+</section>
+<section id="third-example" class="level2">
+<h2 class="anchored" data-anchor-id="third-example">Third example</h2>
+<p>The third example will be very similar to the previous one, but our input will be a lagged version of the variable x2.</p>
+<p>We obtain it using <code>Lag</code> and remove the initial NAs. Keep an eye on the resulting <code>Start</code> value of the time index:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>x2lg3 <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(<span class="fu">Lag</span>(x2, <span class="dv">3</span>))</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x2lg3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 4 
+End = 9 
+Frequency = 1 
+[1] 9.6 7.0 8.8 8.6 7.4 8.8</code></pre>
+</div>
+</div>
+<p>To make sure that our time series do not contain missing values we will make them share that initial value with <code>ts.intersect</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>fdata4 <span class="ot">&lt;-</span> <span class="fu">ts.intersect</span>(x2, x2lg3, ar_noise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We save the column names to restore them after we add the output column y4</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>nc4 <span class="ot">&lt;-</span> <span class="fu">ncol</span>(fdata4)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>cnames4 <span class="ot">&lt;-</span> <span class="fu">colnames</span>(fdata4)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 4 
+End = 9 
+Frequency = 1 
+   x2 x2lg3    ar_noise
+4 8.6   9.6  0.57991358
+5 7.4   7.0  0.39496606
+6 8.8   8.8  0.26037610
+7 7.4   8.6 -0.13670628
+8 7.4   7.4 -0.22026214
+9 7.0   8.8 -0.08475587</code></pre>
+</div>
+</div>
+<p>And now we are ready to add the output.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>fdata4 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(fdata4, <span class="at">y4 =</span> <span class="fl">0.7</span> <span class="sc">*</span> fdata4[,<span class="st">"x2lg3"</span>] <span class="sc">+</span> fdata4[,<span class="st">"ar_noise"</span>])</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 4 
+End = 9 
+Frequency = 1 
+  fdata4.x2 fdata4.x2lg3 fdata4.ar_noise       y4
+4       8.6          9.6      0.57991358 7.299914
+5       7.4          7.0      0.39496606 5.294966
+6       8.8          8.8      0.26037610 6.420376
+7       7.4          8.6     -0.13670628 5.883294
+8       7.4          7.4     -0.22026214 4.959738
+9       7.0          8.8     -0.08475587 6.075244</code></pre>
+</div>
+</div>
+<p>and restore the variable names for the initial columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(fdata4)[<span class="dv">1</span><span class="sc">:</span>nc4] <span class="ot">&lt;-</span> cnames4</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fdata4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 4 
+End = 9 
+Frequency = 1 
+   x2 x2lg3    ar_noise       y4
+4 8.6   9.6  0.57991358 7.299914
+5 7.4   7.0  0.39496606 5.294966
+6 8.8   8.8  0.26037610 6.420376
+7 7.4   8.6 -0.13670628 5.883294
+8 7.4   7.4 -0.22026214 4.959738
+9 7.0   8.8 -0.08475587 6.075244</code></pre>
+</div>
+</div>
+<p>The preceding definition of y4 implies that the model we are using to generate this example is: <span class="math display">\[
+y_4[t] = \dfrac{\omega(B)}{\delta(B)} x_2[t - 3] + v(t)
+\]</span> where <span class="math inline">\(v(t)\)</span> is the same ARMA(1, 0) noise we have used in previous examples.</p>
+<p><strong>Warning:</strong> Keep in mind that in a real problem we would get the output <span class="math inline">\(y_4(t)\)</span> and the input <span class="math inline">\(x_2(t)\)</span>, <strong>not its lagged version</strong>. And initially we would not know what particular lag b (such as 3 here) we should consider for <code>x2[t - b]</code>.</p>
+<p>Note also that for these examples we are keeping the functions <span class="math inline">\(\omega(B)\)</span> and <span class="math inline">\(\delta(B)\)</span> extremely simple. In later examples we will see how to deal with the general case.</p>
+<p>In order to find what lag b we should use we can try several things. First, to simplify the code we will get shorted versions of the columns of the (multi)time series:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>y4 <span class="ot">&lt;-</span> fdata4[,<span class="st">"y4"</span>]</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> fdata4[,<span class="st">"x2"</span>]</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>x2lg3 <span class="ot">&lt;-</span> fdata4[,<span class="st">"x2lg3"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="cross-correlation-function-2" class="level3">
+<h3 class="anchored" data-anchor-id="cross-correlation-function-2">Cross-correlation function</h3>
+<p>Now, one of the first ways to look for b that you may consider is to look at the ccf between input and output:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> y4, <span class="at">x =</span> x2, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this very simple example we can still notice that b = 3 is <em>special</em> in a way. But in general, with more complicated <span class="math inline">\(\omega\)</span> and <span class="math inline">\(\delta\)</span> in the model, this plot will not be easy to interpret.</p>
+</section>
+<section id="transfer-function-model-2" class="level3">
+<h3 class="anchored" data-anchor-id="transfer-function-model-2">Transfer function model</h3>
+<p>An alternative and much better way to look for b is to consider a preliminary and very simple transfer function model that contains a high value of s (the degree of the transfer function numerator) and a low autoregressive order for the noise.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>TF.fit <span class="ot">&lt;-</span> TSA<span class="sc">::</span><span class="fu">arima</span>(y4,</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>                <span class="co">#seasonal = list(order=c(1,0,0),period=24),</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">xtransf =</span> x2,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">transfer =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">9</span>)), <span class="co">#List with (r,s) orders</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">include.mean =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">method=</span><span class="st">"ML"</span>)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(TF.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+TSA::arima(x = y4, order = c(1, 0, 0), include.mean = TRUE, method = "ML", xtransf = x2, 
+    transfer = list(c(0, 9)))
+
+Coefficients:
+         ar1  intercept   T1-MA0  T1-MA1   T1-MA2  T1-MA3  T1-MA4   T1-MA5
+      0.7295    -0.2753  -0.0032  0.0011  -0.0137  0.7043  0.0144  -0.0021
+s.e.  0.0310     0.2188   0.0106  0.0105   0.0103  0.0102  0.0101   0.0101
+      T1-MA6  T1-MA7   T1-MA8   T1-MA9
+      0.0153  0.0200  -0.0082  -0.0127
+s.e.  0.0102  0.0103   0.0104   0.0106
+
+sigma^2 estimated as 0.2556:  log likelihood = -359.93,  aic = 743.87
+
+Training set error measures:
+                       ME      RMSE       MAE        MPE    MAPE      MASE
+Training set -0.001966072 0.5055296 0.3975134 -0.6699472 6.62859 0.2930702
+                    ACF1
+Training set -0.01574397</code></pre>
+</div>
+</div>
+<p>Now when we look at the statistical significance of the estimated coefficients of the model, the one corresponding to b stands out:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(TF.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+            Estimate Std. Error z value Pr(&gt;|z|)    
+ar1        0.7295112  0.0310051 23.5287  &lt; 2e-16 ***
+intercept -0.2752544  0.2187961 -1.2580  0.20838    
+T1-MA0    -0.0031574  0.0105669 -0.2988  0.76509    
+T1-MA1     0.0011422  0.0104654  0.1091  0.91309    
+T1-MA2    -0.0137201  0.0102830 -1.3343  0.18212    
+T1-MA3     0.7043059  0.0101991 69.0558  &lt; 2e-16 ***
+T1-MA4     0.0143869  0.0100937  1.4253  0.15406    
+T1-MA5    -0.0021363  0.0100983 -0.2115  0.83246    
+T1-MA6     0.0152541  0.0101996  1.4956  0.13477    
+T1-MA7     0.0200410  0.0102836  1.9488  0.05131 .  
+T1-MA8    -0.0081691  0.0104483 -0.7819  0.43430    
+T1-MA9    -0.0127448  0.0105983 -1.2025  0.22915    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>In this example the analysis is easy because <span class="math inline">\(\omega(B)\)</span> and <span class="math inline">\(\delta(B)\)</span> are so simple. Later we will see how to use this model to find b even when the transfer function is more complicated. We will learn how to use an <em>identification plot</em> such as this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TF.Identification.plot</span>(x2, TF.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Estimate Std. Error    z value   Pr(&gt;|z|)
+T1-MA0 -0.003157393 0.01056693 -0.2987994 0.76509313
+T1-MA1  0.001142155 0.01046541  0.1091362 0.91309444
+T1-MA2 -0.013720118 0.01028296 -1.3342573 0.18211954
+T1-MA3  0.704305876 0.01019909 69.0557694 0.00000000
+T1-MA4  0.014386900 0.01009371  1.4253329 0.15406100
+T1-MA5 -0.002136288 0.01009827 -0.2115500 0.83245816
+T1-MA6  0.015254087 0.01019965  1.4955504 0.13477085
+T1-MA7  0.020041034 0.01028355  1.9488435 0.05131411
+T1-MA8 -0.008169055 0.01044830 -0.7818548 0.43429994
+T1-MA9 -0.012744833 0.01059826 -1.2025400 0.22915438</code></pre>
+</div>
+</div>
+<p>Even without understanding it completely, we can see that the value 3 stands out in this plot.</p>
+<p>To check if differentiation is needed and to propose an ARMA structure for the noise term we will use a regression error plot like this one:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">TF.RegressionError.plot</span>(y4, x2, TF.fit, <span class="at">lag.max =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 9 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see a hint of a trend in this plot, so we will apply a regular difference (d = 1) when fitting the model. Also from the ACF and PACF we propose a (p, q) = (1, 0) ARMA structure.</p>
+<p><strong>NOTE:</strong> If this regression error is not stationary in variance,boxcox should be applied to input and output series.</p>
+<p>After seeing this plot we are ready to fit a Transfer function model as in the previous examples (remember <span class="math inline">\(\omega, \delta\)</span> are very simple and so r = s = 0). First we use the lagged version with b= 3 of x2 as input.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>xlag <span class="ot">=</span> <span class="fu">Lag</span>(x2, <span class="dv">3</span>)   <span class="co"># b</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>xlag[<span class="fu">is.na</span>(xlag)]<span class="ot">=</span><span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And now we fit the model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>arima.fit <span class="ot">&lt;-</span> <span class="fu">arima</span>(y4,</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">order=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="co"># ARMA model for the noise</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">xtransf =</span> xlag,</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">transfer =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)), <span class="co">#List with (r,s) orders</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">include.mean =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">method=</span><span class="st">"ML"</span>)</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(arima.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+arima(x = y4, order = c(1, 1, 0), include.mean = FALSE, method = "ML", xtransf = xlag, 
+    transfer = list(c(0, 0)))
+
+Coefficients:
+          ar1  T1-MA0
+      -0.1630  0.6815
+s.e.   0.0447  0.0120
+
+sigma^2 estimated as 0.3835:  log likelihood = -466.13,  aic = 936.26
+
+Training set error measures:
+                      ME      RMSE       MAE        MPE     MAPE      MASE
+Training set -0.01487323 0.6186636 0.4422295 -0.8422924 7.487517 0.3260376
+                     ACF1
+Training set -0.006698721</code></pre>
+</div>
+</div>
+</section>
+<section id="diagnosis-1" class="level3">
+<h3 class="anchored" data-anchor-id="diagnosis-1">Diagnosis</h3>
+<p>The diagnosis begins by checking the statistical significance of the estimated coefficients (compare them with the values used to define y4)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(arima.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+z test of coefficients:
+
+        Estimate Std. Error z value  Pr(&gt;|z|)    
+ar1    -0.162972   0.044734 -3.6432 0.0002693 ***
+T1-MA0  0.681467   0.011969 56.9375 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Next we check if the residuals qualify as white noise:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CheckResiduals.ICAI</span>(arima.fit, <span class="at">lag=</span><span class="dv">25</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Ljung-Box test
+
+data:  Residuals from ARIMA(1,1,0)
+Q* = 30.941, df = 23, p-value = 0.1242
+
+Model df: 2.   Total lags used: 25</code></pre>
+</div>
+</div>
+<p>And finally we check that there is no cross correlation between the residuals and the input variable</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">residuals</span>(arima.fit)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>res[<span class="fu">is.na</span>(res)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(<span class="at">y =</span> res, <span class="at">x =</span> x2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="prewhitening" class="level3">
+<h3 class="anchored" data-anchor-id="prewhitening">Prewhitening</h3>
+<p>We said before that directly examining the ccf of input vs output is not easy when the input is autocorrelated. Prewhitening is a technique that helps in such cases. where you want to examine the relationship between two time series without the distorting effect of autocorrelation. To perform prewhitening:</p>
+<ol type="1">
+<li>Fit an ARIMA model to the input to remove its autocorrelations.</li>
+<li>Obtain the residuals (should behave like white noise).</li>
+<li>Apply the same model to the output series to get a <em>transformed output</em>.</li>
+</ol>
+<p>Finally, we can compute the ccf of the transformed output and the residuals.</p>
+<p>Fortunately there is a function in TSA that performs all this process for us and directly outputs the final ccf:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prewhiten</span>(y4, x2, <span class="at">main=</span><span class="st">"Prewhitening of y4 &amp; x2"</span>)</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The result is very clear in this example. You should compare this to the direct ccf that we already obtained before for this example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ccf</span>(y4, x2)</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="sc">-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">col=</span><span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2025_10_08_Dynamic_Regression_1_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
