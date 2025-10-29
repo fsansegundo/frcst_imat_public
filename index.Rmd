@@ -16,7 +16,14 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px}  -->
 <!-- ![](QR.png){height=350px} ![ ](GarcillaCangrejera.jpg){height=350px}  -->
 <!-- ![](QR.png){height=350px} ![ ](Calamon-20110126-DSC_0094a.jpeg){height=350px} -->
-![](QR.png){height=350px} ![ ](./Trepador.png){height=350px}
+<!-- ![](QR.png){height=350px} ![ ](./Trepador.png){height=350px} -->
+![](QR.png){height=350px} ![ ](20170822-1216-DSCN2193_Marmota.JPG){height=350px}
+
+## 2025-10-29 Session
+
++ Transfer functions for seasonal time series: [Lab7_TF_Seasonal_v2](2025_10_29_TransferFunctions_2/Lab7_TF_Seasonal_v2.html)
++ Transfer functions with more than one input: [Lab7_TF_two_inputs_example.R](2025_10_29_TransferFunctions_2/Lab7_TF_two_inputs_example.html)
++ [macro_data.csv](2025_10_29_TransferFunctions_2/macro_data.csv)
 
 
 

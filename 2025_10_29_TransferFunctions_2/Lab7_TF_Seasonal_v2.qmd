@@ -1,0 +1,288 @@
+---
+title: "Lab. 7 Dynamic regression models- Seasonal example."
+author: "Análisis y Predicción de Series Temporales, 3º B IMAT"
+date: "2025-10-29"
+bibliography: "../forecasting.bib"
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-float:
+      collapsed: true
+      location: left
+---
+
+# Preliminaries
+
+## Load libraries 
+
+```{r message=FALSE}
+library(MLTools)
+library(fpp2)
+library(ggplot2)
+library(TSA)
+library(lmtest)  #contains coeftest function
+library(tseries) #contains adf.test function
+library(Hmisc) # for computing lagged variables
+```
+
+## Set working directory
+
+
+```{r eval=FALSE}
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+# Load dataset, EDA and split train/test
+
+```{r}
+fdata <- read.table("Seasonal_TF_1.dat",header = TRUE, sep = "")
+head(fdata)
+```
+
+
+
+```{r}
+# If you need to change column names
+colnames(fdata) <- c("Y","X")
+```
+
+Convert to time series object. In this case the frequency will be apparent in the time plot below:
+
+```{r}
+freq <- 24
+fdata_ts <- ts(fdata, frequency = freq)
+```
+
+and get an initial time plot (sometimes using head to zoom in helps)
+
+```{r}
+autoplot(fdata_ts, facets = TRUE)
+# autoplot(head(fdata_ts, 100), facets = TRUE)
+```
+
+```{r}
+ggtsdisplay(fdata_ts[,1], lag=5 * freq)
+```
+
+
+```{r eval=FALSE, echo=FALSE}
+sp <- spectrum(diff(ts(fdata[,1], frequency = 1)), log = "no", method = "pgram")
+abline(v=1/24, col="red", lty=2)
+```
+
+
+## Scale values 
+
+When the range of the variables is very different, we recommend scaling them to facilitate the identification of the model.
+
+```{r}
+y <- fdata_ts[,1]/100000
+x <- fdata_ts[,2]/100000
+```
+
+## Train/Test split
+
+```{r}
+test_size = 4 * freq
+
+y.TR <- subset(y, end = length(y) - test_size)
+x.TR <- subset(x, end = length(y) - test_size)
+
+tail(y.TR)
+```
+
+
+```{r}
+y.TV <- subset(y, start = length(y) - test_size + 1)
+x.TV <- subset(x, start = length(y) - test_size + 1)
+
+head(y.TV)
+```
+
+# Identification and fitting process 
+
+```{r}
+ggtsdisplay(y, lag=4 * freq)
+```
+
+## First TF model 
+
+Fit initial FT model with large s
+
+```{r}
+# This arima function belongs to the TSA package
+TF.fit <- arima(y.TR,
+                order=c(1, 0, 0),
+                seasonal = list(order=c(1, 0, 0), period=freq),
+                xtransf = x.TR,
+                transfer = list(c(0,9)), #List with (r,s) orders
+                include.mean = TRUE,
+                method="ML")
+```
+
+
+```{r}
+# Check regression error to see the need of differentiation
+TF.RegressionError.plot(y,x,TF.fit,lag.max = 100)
+```
+## Second model
+
+Seasonal differencing is required
+
+**NOTE:** If this regression error is not stationary in variance,boxcox should be applied to input and output series.
+
+```{r}
+TF.fit <- arima(y.TR,
+                order=c(1, 0, 0),
+                seasonal = list(order=c(1, 1, 0), period=freq),
+                xtransf = x.TR,
+                transfer = list(c(0,9)), #List with (r,s) orders
+                include.mean = TRUE,
+                method="ML")
+```
+
+Check regression error to see the need of differentiation
+
+```{r}
+TF.RegressionError.plot(y,x,TF.fit,lag.max = 100)
+```
+
+Identify the transfer function parameters for the explanatory variable
+
+```{r}
+TF.Identification.plot(x,TF.fit)
+```
+## Fit arima noise with the selected (b, r, s) and ARMA orders
+ 
+
+```{r}
+p <- 0 ; d <- 0; q <- 1;
+P <- 1 ; D <- 1; Q <- 0;
+
+b <- 0; r <- 0; s <- 0;
+```
+
+
+```{r}
+xlag = Lag(x, b)   # b
+xlag[is.na(xlag)]=0
+```
+
+
+```{r}
+arima.fit <- arima(y,
+                   order=c(p, d, q),
+                   seasonal = list(order=c(P, D, Q), period=freq),
+                   xtransf = xlag,
+                   transfer = list(c(r, s)), #List with (r,s) orders
+                   include.mean = FALSE,
+                   method="ML")
+```
+
+## Diagnostics of the fitted model
+
+```{r}
+summary(arima.fit) # summary of training errors and estimated coefficients
+```
+ Check the statistical significance of estimated coefficients
+
+```{r}
+coeftest(arima.fit)
+```
+
+Check residuals
+
+```{r}
+CheckResiduals.ICAI(arima.fit, lag=50)
+```
+
+## Cross correlation between the residuals and the explanatory variable
+
+```{r}
+res <- residuals(arima.fit)
+res[is.na(res)] <- 0
+ccf(y = res, x = x)
+```
+
+## Visual check of the fitted values vs real values in the training period
+
+
+```{r}
+autoplot(y, series = "Real", size = 2, alpha=0.8, color="blue") +
+  forecast::autolayer(fitted(arima.fit), series = "Fitted", color="yellow")
+```
+
+## Training errors of the model
+
+```{r}
+accuracy(fitted(arima.fit),y.TR)
+```
+
+
+# Forecast for new data with h = 1 
+
+
+```{r}
+h <- 1
+
+y.TV.est <- y * NA
+
+for (i in seq(length(y.TR) + 1, length(y) - h, 1)){# loop for validation period
+  y.TV.est[i] <- TF.forecast(y.old = subset(y,end=i-1), #past values of the series
+                             x.old = subset(x,end=i-1), #Past values of the explanatory variables
+                             x.new = subset(x,start = i,end=i), #New values of the explanatory variables
+                             model = arima.fit, #fitted transfer function model
+                             h=h)[h] #Forecast horizon
+}
+
+y.TV.est <- na.omit(y.TV.est)
+```
+
+Direct forecast:
+
+```{r}
+y.TV.est2 <- TF.forecast(y.old = subset(y,end=i-1), #past values of the series
+                             x.old = subset(x,end=i-1), #Past values of the explanatory variables
+                             x.new = subset(x,start = i,end=i), #New values of the explanatory variables
+                             model = arima.fit, #fitted transfer function model
+                             h=length(y.TV)) #forecast horizon
+
+
+
+```
+
+
+
+## Plot of the forecast
+
+
+
+```{r}
+y.TV_ts <- ts(y.TV, frequency = freq, start = end(y.TR) + c(0, 1))
+y.TV.est_ts <- ts(y.TV.est, frequency = freq, start = end(y.TR) + c(0, 1))
+
+y.TV.est2_ts <- ts(y.TV.est2, frequency = freq, start = end(y.TR) + c(0, 1))
+head(y.TV_ts)
+```
+
+
+```{r}
+autoplot(y.TV_ts, series = "Test set, real values", size=2, alpha=0.5, color="blue") +
+  forecast::autolayer(y.TV.est_ts, series = "Forecast", color = "yellow") + 
+  forecast::autolayer(y.TV.est2_ts, series = "Direct Forecast", color = "tan") +
+  forecast::autolayer(tail(y.TR, freq), series = "Training data", color = "red") 
+  
+```
+
+
+
+```{r}
+accuracy(y.TV.est*100000,y.TV*100000)
+
+```
+
+```{r}
+accuracy(y.TV.est2*100000,y.TV*100000)
+```
+
