@@ -18,7 +18,14 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](Calamon-20110126-DSC_0094a.jpeg){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](./Trepador.png){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170822-1216-DSCN2193_Marmota.JPG){height=350px} -->
-![](QR.png){height=350px} ![ ](DSCN7775 copia.jpg){height=350px}
+<!-- ![](QR.png){height=350px} ![ ](DSCN7775 copia.jpg){height=350px} Rascon--> 
+![](QR.png){height=350px} ![ ](MilanoNegro-CasaCampo-DSCN3126.jpeg){height=350px}
+
+
+## 2025-11-12 Session
+
++ [RNN_extra_slides.pdf](./2025_11_12_NeuralNetworks/RNN_extra_slides.pdf)
+
 
 ## 2025-11-05 Session
 
