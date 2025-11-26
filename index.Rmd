@@ -19,7 +19,20 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](./Trepador.png){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170822-1216-DSCN2193_Marmota.JPG){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](DSCN7775 copia.jpg){height=350px} Rascon--> 
-![](QR.png){height=350px} ![ ](MilanoNegro-CasaCampo-DSCN3126.jpeg){height=300px}
+<!-- ![](QR.png){height=350px} ![ ](MilanoNegro-CasaCampo-DSCN3126.jpeg){height=300px} -->
+![](QR.png){height=350px} ![ ](ibisbilll.JPG){height=300px}
+
+
+## 2025-11-26 Session
+
++ [Trevor Hastie - Gradient Boosting Machine Learning](https://www.youtube.com/watch?v=wPqtzj5VZus)
+
+### Transitioning from R to Python in forecasting:
+
++ [Hyndman's *Forecasting: Principles and Practice, the Pythonic Way*](https://otexts.com/fpppy/)
++ [Nixtlaverse](https://nixtla.github.io/nixtlaverse/) 
++ [Blog: Data Science with Marco (Peixeiro)](https://www.datasciencewithmarco.com/blog?page=1) including [Time Series Forecasting with SARIMA in Python](https://www.datasciencewithmarco.com/blog/time-series-forecasting-with-sarima-in-python)
+
 
 
 ## 2025-11-12 Session
