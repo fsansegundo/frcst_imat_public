@@ -20,7 +20,10 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](20170822-1216-DSCN2193_Marmota.JPG){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](DSCN7775 copia.jpg){height=350px} Rascon--> 
 <!-- ![](QR.png){height=350px} ![ ](MilanoNegro-CasaCampo-DSCN3126.jpeg){height=300px} -->
-![](QR.png){height=350px} ![ ](ibisbilll.JPG){height=300px}
+<!-- ![](QR.png){height=350px} ![ ](ibisbilll.JPG){height=300px} -->
+![](QR.png){height=350px} ![ ](MountainCaribou.jpg){height=300px}
+
+
 
 
 ## 2025-11-26 Session
