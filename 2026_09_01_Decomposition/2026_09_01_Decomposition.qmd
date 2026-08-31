@@ -2,8 +2,14 @@
 title: "2026_09_01 Decomposition, lecture notes"
 # output: html_document
 format:
-  html:
+  # html:
+  #   toc: true
+  html: 
     toc: true
+    code-tools: true
+    code-fold: show
+    code-summary: "Hide the code"
+    embed-resources: true
 date: "`r Sys.Date()`"
 bibliography: "../forecasting.bib"
 link-citations: true 
