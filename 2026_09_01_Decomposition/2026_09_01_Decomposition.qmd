@@ -1,5 +1,5 @@
 ---
-title: "2025_09_03 Decomposition, lecture notes"
+title: "2026_09_01 Decomposition, lecture notes"
 # output: html_document
 format:
   html:
