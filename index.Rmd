@@ -11,10 +11,10 @@ csl: apa-6th-edition.csl
 knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
-![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px}
+![](QR.png){height=350px} ![ ](./fig/Albufera-20110103-DSC_0065-GarcillaCangrejera.jpg){height=350px}
+<!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px}  -->
-<!-- ![](QR.png){height=350px} ![ ](GarcillaCangrejera.jpg){height=350px}  -->
 <!-- ![](QR.png){height=350px} ![ ](Calamon-20110126-DSC_0094a.jpeg){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](./Trepador.png){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](20170822-1216-DSCN2193_Marmota.JPG){height=350px} -->
@@ -23,10 +23,15 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](ibisbilll.JPG){height=300px} -->
 <!-- ![](QR.png){height=350px} ![ ](MountainCaribou.jpg){height=300px} -->
 
+## 2026-09-24 Session 
+
++ [Lab. 4 SARIMA, additional notes](./2026/2026_SARIMA/2026_SARIMA.html)
++ [Transfer Function Models, additional examples](./2026/2026_TransferFunctions_1/2026_Dynamic_Regression_1.html)
+
 
 ## 2026-09-01 Session 
 
-+ [Lab. 1 Decomposition, additional notes](./2026_09_01_Decomposition/2026_09_01_Decomposition.html)
++ [Lab. 1 Decomposition, additional notes](./2026/2026_09_01_Decomposition/2026_09_01_Decomposition.html)
 + **Recommended reading:** [Chapters 1 and 2 of fpp2](https://otexts.com/fpp2/). Also watch the videos in the corresponding [chapters of fpp3](https://otexts.com/fpp3/)
 + [Forecasting: Principles and Practice, the Pythonic Way](https://otexts.com/fpppy/)
 + [Time-Series Forecasting: Deep Learning vs Statistics](https://medium.com/data-science/time-series-forecasting-deep-learning-vs-statistics-who-wins-c568389d02df). A Medium post (2023) by N. Kafritsas.
