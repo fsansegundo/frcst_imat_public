@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Box-Cox: De las Recetas Tradicionales a la Familia Paramétrica</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f8fafc;
+      --bg-card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --color-original: #2563eb;
+      --color-transformed: #d97706;
+      --color-accent: #7c3aed;
+      --radius: 8px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-subtle);
+      color: var(--text);
+      line-height: 1.4;
+      padding: 1rem;
+      max-width: 1380px;
+      margin: 0 auto;
+    }
+
+    /* Cabecera Compacta */
+    header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .badge-course {
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 0.15rem 0.5rem;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Navegación Secuencial de la Clase (5 Pasos Grandes y Claros) */
+    .class-stepper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .class-stepper {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.65rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      user-select: none;
+    }
+
+    .step-card:hover {
+      border-color: #93c5fd;
+      background: #f8faff;
+    }
+
+    .step-card.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .step-card.unification {
+      border-color: #e9d5ff;
+    }
+
+    .step-card.unification.active {
+      border-color: var(--color-accent);
+      background: #faf5ff;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+    }
+
+    .step-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .step-num {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .step-lambda-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: #ffffff;
+      padding: 0.05rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .step-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .step-formula {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #475569;
+    }
+
+    /* Tira de Información Matemática (1 Sola Línea) */
+    .case-strip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 0.55rem 1rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    .case-strip.unification {
+      border-left-color: var(--color-accent);
+    }
+
+    .strip-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .strip-lbl {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .strip-val {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .strip-code {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #1e293b;
+      background: #f1f5f9;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .strip-badge-blue {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #1d4ed8;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .strip-badge-target {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #047857;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    /* Barra de Control de Lambda y Conmutador */
+    .lambda-toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.6rem 1.15rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.15rem;
+    }
+
+    .slider-box {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .slider-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .slider-input {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .lambda-badge {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      font-weight: 700;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.2rem 0.65rem;
+      border-radius: 5px;
+      min-width: 78px;
+      text-align: center;
+    }
+
+    /* Botón Único de Transición (Conmutador Inteligente) */
+    .btn-toggle-switch {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1.5px solid #bfdbfe;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+      white-space: nowrap;
+    }
+
+    .btn-toggle-switch:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .btn-toggle-switch.is-transformed {
+      background: #ffffff;
+      color: #334155;
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .btn-toggle-switch.is-transformed:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .toggle-box {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* Los Dos Gráficos Protagonistas */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .chart-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .legend-box {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .leg-dot {
+      width: 10px;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* SECCIÓN DE LA FAMILIA BOX-COX (PASO 5) CON NOTACIÓN LATEX */
+    .unification-section {
+      background: var(--bg-card);
+      border: 1px solid #ddd6fe;
+      border-radius: var(--radius);
+      padding: 1.15rem 1.4rem;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 1px 3px rgba(124, 58, 237, 0.05);
+    }
+
+    /* Caja de Fórmula Estilo LaTeX */
+    .unification-formula-box {
+      background: #faf5ff;
+      border: 1px solid #d8b4fe;
+      border-radius: 10px;
+      padding: 1.15rem 1.5rem;
+      margin-bottom: 1.15rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(124, 58, 237, 0.04);
+    }
+
+    .latex-eq {
+      display: inline-flex;
+      align-items: center;
+      font-family: "Cambria Math", "KaTeX_Math", "Latin Modern Math", "STIX Two Math", "Times New Roman", serif;
+      font-size: 1.35rem;
+      color: #3b0764;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .math-var {
+      font-style: italic;
+      font-family: "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
+    }
+
+    .math-sup {
+      font-size: 0.68em;
+      vertical-align: 0.55em;
+      margin-left: 0.05em;
+    }
+
+    .math-rel {
+      margin: 0 0.55rem;
+      color: #581c87;
+    }
+
+    .math-cases {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .cases-brace {
+      width: 14px;
+      height: 70px;
+      flex-shrink: 0;
+    }
+
+    .cases-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      text-align: left;
+    }
+
+    .case-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .case-expr {
+      display: inline-flex;
+      align-items: center;
+      min-width: 95px;
+    }
+
+    .case-cond {
+      font-family: var(--font-sans);
+      font-size: 0.84rem;
+      color: #6b21a8;
+      background: #f3e8ff;
+      padding: 0.15rem 0.55rem;
+      border-radius: 5px;
+      border: 1px solid #e9d5ff;
+      white-space: nowrap;
+    }
+
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      font-size: 0.95em;
+    }
+
+    .fraction .num {
+      padding: 0 0.25rem 0.15rem 0.25rem;
+      border-bottom: 1.6px solid #581c87;
+      text-align: center;
+    }
+
+    .fraction .denom {
+      padding: 0.15rem 0.25rem 0 0.25rem;
+      text-align: center;
+    }
+
+    .math-op {
+      font-style: normal;
+      font-family: "Times New Roman", serif;
+      margin-right: 0.12rem;
+    }
+
+    .unification-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .unification-table th {
+      background: #f5f3ff;
+      color: #4c1d95;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid #ddd6fe;
+    }
+
+    .unification-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .unification-table tr {
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .unification-table tr:hover {
+      background: #faf5ff;
+    }
+
+    .unification-table tr.active-row {
+      background: #ede9fe;
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecera Compacta -->
+  <header>
+    <div class="header-title">
+      <h1>
+        La Transformación de Box-Cox
+        <span class="badge-course">Series Temporales</span>
+      </h1>
+    </div>
+    <button class="btn-secondary" id="btnRegenerateSample" title="Semilla didáctica maestra fijada (5275). Pulsa para explorar otra muestra.">
+      🎲 Nueva Muestra
+    </button>
+  </header>
+
+  <!-- Stepper de 5 Pasos: El Hilo Conductor de la Clase -->
+  <nav class="class-stepper">
+    <div class="step-card active" data-step="log">
+      <div class="step-topline">
+        <span class="step-num">Paso 1</span>
+        <span class="step-lambda-badge">λ = 0.0</span>
+      </div>
+      <span class="step-title">🛫 Logaritmo</span>
+      <span class="step-formula">w = ln(y)</span>
+    </div>
+
+    <div class="step-card" data-step="sqrt">
+      <div class="step-topline">
+        <span class="step-num">Paso 2</span>
+        <span class="step-lambda-badge">λ = 0.5</span>
+      </div>
+      <span class="step-title">📞 Raíz Cuadrada</span>
+      <span class="step-formula">w = √y</span>
+    </div>
+
+    <div class="step-card" data-step="ident">
+      <div class="step-topline">
+        <span class="step-num">Paso 3</span>
+        <span class="step-lambda-badge">λ = 1.0</span>
+      </div>
+      <span class="step-title">🌡️ Identidad</span>
+      <span class="step-formula">w = y (Sin transf.)</span>
+    </div>
+
+    <div class="step-card" data-step="inv">
+      <div class="step-topline">
+        <span class="step-num">Paso 4</span>
+        <span class="step-lambda-badge">λ = -1.0</span>
+      </div>
+      <span class="step-title">⏳ Inversa</span>
+      <span class="step-formula">w = 1/y</span>
+    </div>
+
+    <div class="step-card unification" data-step="unif">
+      <div class="step-topline">
+        <span class="step-num">Paso 5</span>
+        <span class="step-lambda-badge" style="color:var(--color-accent); border-color:#d8b4fe;">General</span>
+      </div>
+      <span class="step-title">✨ Familia Box-Cox</span>
+      <span class="step-formula">w = (y^λ - 1)/λ</span>
+    </div>
+  </nav>
+
+  <!-- Tira de Información Matemática (1 Sola Línea) -->
+  <section class="case-strip" id="caseStrip">
+    <div class="strip-group">
+      <span class="strip-lbl">Serie:</span>
+      <span class="strip-val" id="txtCaseName">Demanda Aérea Multiplicativa</span>
+    </div>
+    <div class="strip-group">
+      <span class="strip-lbl">Varianza:</span>
+      <span class="strip-code" id="txtCaseDispersion">σ_t² ∝ μ_t²</span>
+    </div>
+    <div class="strip-group">
+      <span class="strip-lbl">Pendiente en R:</span>
+      <span class="strip-badge-blue" id="txtCaseSlope">b ≈ 1.0</span>
+    </div>
+    <div class="strip-group">
+      <span class="strip-lbl">Box-Cox (λ = 1 - b):</span>
+      <span class="strip-badge-target" id="txtTargetLambda">λ* = 0.0</span>
+    </div>
+  </section>
+
+  <!-- Control de Lambda con Botón Único de Alternancia y Distribución Equilibrada -->
+  <section class="lambda-toolbar">
+    <div class="slider-box">
+      <span class="slider-label">Potencia λ:</span>
+      <input type="range" class="slider-input" id="lambdaSlider" min="-2.0" max="2.5" step="0.01" value="1.0">
+      <span class="lambda-badge" id="lambdaDisplay">λ = 1.00</span>
+    </div>
+
+    <!-- Botón Único de Alternancia Inteligente: Original (λ = 1) ↔ Recomendado (λ*) -->
+    <button class="btn-toggle-switch" id="btnToggleOptimal" title="Alternar entre escala original (λ = 1) y óptimo recomendado (λ = λ*)">
+      <span id="btnToggleIcon">⚡</span>
+      <span id="btnToggleText">Aplicar Recomendado (λ = 0.0)</span>
+    </button>
+
+    <label class="toggle-box">
+      <input type="checkbox" id="chkEvalTransformed">
+      <span>Evaluar recta de R sobre serie transformada w(t)</span>
+    </label>
+  </section>
+
+  <!-- Los Dos Gráficos Protagonistas -->
+  <main class="charts-grid">
+
+    <!-- GRÁFICO 1: SERIE TEMPORAL -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Serie Temporal: Original y(t) vs Transformada w(t)</span>
+        <div class="legend-box">
+          <div class="leg-item" style="color:var(--color-original);">
+            <div class="leg-dot" style="background:var(--color-original);"></div>
+            <span>y(t) Original</span>
+          </div>
+          <div class="leg-item" style="color:var(--color-transformed);">
+            <div class="leg-dot" style="background:var(--color-transformed);"></div>
+            <span id="lblTransLegend">w(t) [λ = 1.00]</span>
+          </div>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvas_ts"></canvas>
+      </div>
+    </div>
+
+    <!-- GRÁFICO 2: DIAGNÓSTICO EN R (BoxCox.lambda.plot) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Diagnóstico en R: <code>BoxCox.lambda.plot</code> (MLTools)</span>
+        <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">
+          Modelo: log(s) ~ log(m)
+        </span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvas_rplot"></canvas>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- PANEL DE LA FAMILIA BOX-COX (PASO 5) CON NOTACIÓN LATEX -->
+  <section class="unification-section hidden" id="unificationSection">
+
+    <!-- Fórmula en Notación Matemática LaTeX -->
+    <div class="unification-formula-box">
+      <div class="latex-eq">
+        <span class="math-var">y</span><span class="math-sup">(λ)</span>
+        <span class="math-rel">=</span>
+        <div class="math-cases">
+          <svg class="cases-brace" viewBox="0 0 16 70" preserveAspectRatio="none">
+            <path d="M14,2 C6,2 4,14 4,26 C4,32 1,35 1,35 C1,35 4,38 4,44 C4,56 6,68 14,68" fill="none" stroke="#581c87" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <div class="cases-content">
+            <div class="case-row">
+              <div class="case-expr">
+                <span class="fraction">
+                  <span class="num"><span class="math-var">y</span><span class="math-sup">λ</span> − 1</span>
+                  <span class="denom"><span class="math-var">λ</span></span>
+                </span>
+              </div>
+              <div class="case-cond">si &nbsp;<span class="math-var">λ</span> ≠ 0</div>
+            </div>
+            <div class="case-row">
+              <div class="case-expr">
+                <span class="math-op">ln</span>(<span class="math-var">y</span>)
+              </div>
+              <div class="case-cond">si &nbsp;<span class="math-var">λ</span> = 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table class="unification-table">
+      <thead>
+        <tr>
+          <th>Transformación</th>
+          <th>Varianza (σ_t²)</th>
+          <th>Pendiente en R (b)</th>
+          <th>λ = 1 - b</th>
+          <th>Fórmula Box-Cox y^(λ)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-jump-step="ident">
+          <td><strong>Identidad</strong></td>
+          <td><code>σ_t² ∝ 1</code></td>
+          <td><span class="strip-badge-blue">b ≈ 0.0</span></td>
+          <td><span class="strip-badge-target">λ = 1.0</span></td>
+          <td><code>w = y - 1</code></td>
+        </tr>
+        <tr data-jump-step="sqrt">
+          <td><strong>Raíz Cuadrada</strong></td>
+          <td><code>σ_t² ∝ μ_t</code></td>
+          <td><span class="strip-badge-blue">b ≈ 0.5</span></td>
+          <td><span class="strip-badge-target">λ = 0.5</span></td>
+          <td><code>w = 2(√y - 1)</code></td>
+        </tr>
+        <tr data-jump-step="log" class="active-row">
+          <td><strong>Logaritmo</strong></td>
+          <td><code>σ_t² ∝ μ_t²</code></td>
+          <td><span class="strip-badge-blue">b ≈ 1.0</span></td>
+          <td><span class="strip-badge-target">λ = 0.0</span></td>
+          <td><code>w = ln(y)</code></td>
+        </tr>
+        <tr data-jump-step="inv">
+          <td><strong>Inversa</strong></td>
+          <td><code>σ_t² ∝ μ_t⁴</code></td>
+          <td><span class="strip-badge-blue">b ≈ 2.0</span></td>
+          <td><span class="strip-badge-target">λ = -1.0</span></td>
+          <td><code>w = 1 - 1/y</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    // CASOS DE LA CLASE
+    const CASES = {
+      log: {
+        name: "Demanda Aérea Multiplicativa (Pasajeros)",
+        dispersion: "σ_t² ∝ μ_t²",
+        slope: "b ≈ 1.0",
+        targetLambda: 0.0
+      },
+      sqrt: {
+        name: "Conteos de Tráfico y Llegadas (Poisson)",
+        dispersion: "σ_t² ∝ μ_t",
+        slope: "b ≈ 0.5",
+        targetLambda: 0.5
+      },
+      ident: {
+        name: "Proceso Aditivo Homocedástico (Sin Cambio)",
+        dispersion: "σ_t² ∝ 1",
+        slope: "b ≈ 0.0",
+        targetLambda: 1.0
+      },
+      inv: {
+        name: "Tiempos de Espera en Colas Saturadas (M/M/1)",
+        dispersion: "σ_t² ∝ μ_t⁴",
+        slope: "b ≈ 2.0",
+        targetLambda: -1.0
+      },
+      unif: {
+        name: "Familia de Transformaciones Box-Cox",
+        dispersion: "σ_t² ∝ μ_t^(2(1 - λ))",
+        slope: "b = 1 - λ",
+        targetLambda: 0.0
+      }
+    };
+
+    const STATE = {
+      currentCase: 'log',
+      lambda: 1.0, // Por defecto siempre empieza en Original (λ = 1)
+      rawData: [],
+      evalTransformed: false,
+      windowWidth: 10
+    };
+
+    // SEMILLAS MAESTRAS DIDÁCTICAS
+    // Calibradas numéricamente para garantizar estimaciones empíricas exactas en R:
+    // - log:   λ = 0.01, R2 = 0.85, slope_transf = -0.018 (Semilla 5275)
+    // - sqrt:  λ = 0.50, R2 = 0.85, slope_transf = -0.000 (Semilla 935)
+    // - ident: λ = 1.00, b = 0.00 (Semilla 7275)
+    // - inv:   λ = -0.98, R2 = 0.84, slope_transf = -0.014 (Semilla 8275)
+    const CASE_BASE_SEEDS = {
+      log: 5275,
+      sqrt: 935,
+      ident: 7275,
+      inv: 8275,
+      unif: 5275
+    };
+    let seedOffset = 0;
+
+    // Generador pseudo-aleatorio determinista Mulberry32
+    function mulberry32(a) {
+      let state = (a >>> 0);
+      return function() {
+        state = (state + 0x6D2B79F5) >>> 0;
+        let t = state;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        t = ((t ^ (t >>> 14)) >>> 0);
+        return t / 4294967296.0;
+      };
+    }
+
+    // Generador normal con algoritmo de Box-Muller determinista
+    function createNormalGenerator(seed) {
+      const rng = mulberry32(seed);
+      let spare = null;
+      return function() {
+        if (spare !== null) {
+          const v = spare;
+          spare = null;
+          return v;
+        }
+        let u1 = 0;
+        while (u1 <= 1e-12) u1 = rng();
+        const u2 = rng();
+        const num = Math.sqrt(-2.0 * Math.log(u1));
+        spare = num * Math.sin(2.0 * Math.PI * u2);
+        return num * Math.cos(2.0 * Math.PI * u2);
+      };
+    }
+
+    // ELEMENTOS DEL DOM
+    const lambdaSlider = document.getElementById('lambdaSlider');
+    const lambdaDisplay = document.getElementById('lambdaDisplay');
+    const txtCaseName = document.getElementById('txtCaseName');
+    const txtCaseDispersion = document.getElementById('txtCaseDispersion');
+    const txtCaseSlope = document.getElementById('txtCaseSlope');
+    const txtTargetLambda = document.getElementById('txtTargetLambda');
+    const btnRegenerateSample = document.getElementById('btnRegenerateSample');
+    const chkEvalTransformed = document.getElementById('chkEvalTransformed');
+    const lblTransLegend = document.getElementById('lblTransLegend');
+    const caseStrip = document.getElementById('caseStrip');
+    const unificationSection = document.getElementById('unificationSection');
+
+    // Botón único de alternancia
+    const btnToggleOptimal = document.getElementById('btnToggleOptimal');
+    const btnToggleIcon = document.getElementById('btnToggleIcon');
+    const btnToggleText = document.getElementById('btnToggleText');
+
+    const canvasTS = document.getElementById('canvas_ts');
+    const canvasRPlot = document.getElementById('canvas_rplot');
+
+    // MATEMÁTICAS
+    function boxCoxTransform(y, lmbda) {
+      if (Math.abs(lmbda) < 1e-6) {
+        const lny = Math.log(y);
+        return lny + 0.5 * lmbda * lny * lny;
+      }
+      return (Math.pow(y, lmbda) - 1.0) / lmbda;
+    }
+
+    function generateData(caseKey, offset = 0) {
+      const N = 144;
+      const data = [];
+
+      const base = CASE_BASE_SEEDS[caseKey] || 5275;
+      const seed = (base + offset * 10007) >>> 0;
+      const randNormal = createNormalGenerator(seed);
+
+      if (caseKey === 'log' || caseKey === 'unif') {
+        const seasonal = [0.90, 0.86, 1.01, 1.06, 1.10, 1.25, 1.36, 1.30, 1.12, 0.97, 0.84, 0.94];
+        for (let t = 1; t <= N; t++) {
+          const sIdx = (t - 1) % 12;
+          const trend = 110 + 2.3 * t;
+          const noise = Math.exp(randNormal() * 0.075 - 0.0028);
+          data.push(Math.max(10, trend * seasonal[sIdx] * noise));
+        }
+      } else if (caseKey === 'sqrt') {
+        for (let t = 1; t <= N; t++) {
+          const season = 3.2 * Math.sin((2 * Math.PI * t) / 12);
+          const sqrtY = 8.0 + 0.12 * t + season + randNormal() * 0.55;
+          data.push(Math.max(1, sqrtY * sqrtY));
+        }
+      } else if (caseKey === 'ident') {
+        for (let t = 1; t <= N; t++) {
+          const trend = 180 + 0.7 * t;
+          const season = 38 * Math.cos((2 * Math.PI * t) / 12);
+          const noise = randNormal() * 9.2;
+          data.push(Math.max(20, trend + season + noise));
+        }
+      } else if (caseKey === 'inv') {
+        for (let t = 1; t <= N; t++) {
+          const trendW = 0.28 + 0.0033 * t;
+          const seasonW = 0.055 * Math.sin((2 * Math.PI * t) / 12);
+          const noiseW = randNormal() * 0.038;
+          const w = Math.min(0.88, Math.max(0.12, trendW + seasonW + noiseW));
+          data.push(Math.max(0.5, 1.0 / (1.0 - w)));
+        }
+      }
+
+      return data;
+    }
+
+    // CANVAS HIDPI
+    function setupDPI(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, width: rect.width, height: rect.height };
+    }
+
+    // GRÁFICO 1: SERIE TEMPORAL
+    function renderTimeSeries() {
+      const { ctx, width, height } = setupDPI(canvasTS);
+      ctx.clearRect(0, 0, width, height);
+
+      const N = STATE.rawData.length;
+      if (N < 2) return;
+
+      const padL = 50, padR = 50, padT = 25, padB = 30;
+      const plotW = width - padL - padR;
+      const plotH = height - padT - padB;
+
+      const transData = STATE.rawData.map(y => boxCoxTransform(y, STATE.lambda));
+
+      let minOrig = Math.min(...STATE.rawData);
+      let maxOrig = Math.max(...STATE.rawData);
+      let minTrans = Math.min(...transData);
+      let maxTrans = Math.max(...transData);
+
+      const mOrig = (maxOrig - minOrig) * 0.06 || 1;
+      const mTrans = (maxTrans - minTrans) * 0.06 || 1;
+      minOrig -= mOrig; maxOrig += mOrig;
+      minTrans -= mTrans; maxTrans += mTrans;
+
+      // Rejilla
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(padL, padT, plotW, plotH);
+
+      ctx.setLineDash([3, 4]);
+      for (let i = 1; i <= 3; i++) {
+        const y = padT + (plotH * i) / 4;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // 1. y(t) Original (Azul)
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const x = padL + (i / (N - 1)) * plotW;
+        const y = padT + plotH - ((STATE.rawData[i] - minOrig) / (maxOrig - minOrig)) * plotH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // 2. w(t) Transformada (Ámbar)
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const x = padL + (i / (N - 1)) * plotW;
+        const y = padT + plotH - ((transData[i] - minTrans) / (maxTrans - minTrans)) * plotH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Rótulos
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#2563eb';
+      ctx.textAlign = 'right';
+      ctx.fillText(maxOrig.toFixed(0), padL - 6, padT + 10);
+      ctx.fillText(minOrig.toFixed(0), padL - 6, padT + plotH);
+
+      ctx.fillStyle = '#d97706';
+      ctx.textAlign = 'left';
+      ctx.fillText(maxTrans.toFixed(1), width - padR + 6, padT + 10);
+      ctx.fillText(minTrans.toFixed(1), width - padR + 6, padT + plotH);
+    }
+
+    // GRÁFICO 2: DIAGNÓSTICO EN R (MLTools::BoxCox.lambda.plot)
+    function renderRPlot() {
+      const { ctx, width, height } = setupDPI(canvasRPlot);
+      ctx.clearRect(0, 0, width, height);
+
+      const N = STATE.rawData.length;
+      const W = STATE.windowWidth || 10;
+      if (N < W + 2) return;
+
+      const sourceData = STATE.evalTransformed
+        ? STATE.rawData.map(y => boxCoxTransform(y, STATE.lambda))
+        : STATE.rawData;
+
+      const pts = [];
+      for (let i = 0; i <= N - W; i++) {
+        let sum = 0;
+        for (let j = 0; j < W; j++) sum += sourceData[i + j];
+        const m = sum / W;
+        let sumSq = 0;
+        for (let j = 0; j < W; j++) {
+          const diff = sourceData[i + j] - m;
+          sumSq += diff * diff;
+        }
+        const s = Math.sqrt(sumSq / (W - 1));
+        if (m > 0 && s > 0) pts.push({ x: Math.log(m), y: Math.log(s) });
+      }
+
+      if (pts.length < 3) return;
+
+      const K = pts.length;
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, sumYY = 0;
+      for (let p of pts) {
+        sumX += p.x; sumY += p.y;
+        sumXY += p.x * p.y;
+        sumXX += p.x * p.x;
+        sumYY += p.y * p.y;
+      }
+      const meanX = sumX / K, meanY = sumY / K;
+      const Sxx = sumXX - K * meanX * meanX;
+      const Sxy = sumXY - K * meanX * meanY;
+      const Syy = sumYY - K * meanY * meanY;
+
+      const slope = (Math.abs(Sxx) > 1e-12) ? Sxy / Sxx : 0;
+      const intercept = meanY - slope * meanX;
+      const r2 = (Math.abs(Sxx * Syy) > 1e-12) ? Math.max(0, Math.min(1, (Sxy * Sxy) / (Sxx * Syy))) : 0;
+      const lambdaEst = 1.0 - slope;
+
+      const RSS = Math.max(0, Syy - slope * Sxy);
+      const seResid = K > 2 ? Math.sqrt(RSS / (K - 2)) : 0.01;
+
+      const padL = 55, padR = 20, padT = 48, padB = 36;
+      const plotW = width - padL - padR;
+      const plotH = height - padT - padB;
+
+      let minX = Math.min(...pts.map(p => p.x));
+      let maxX = Math.max(...pts.map(p => p.x));
+      let minY = Math.min(...pts.map(p => p.y));
+      let maxY = Math.max(...pts.map(p => p.y));
+
+      const marginX = (maxX - minX) * 0.08 || 0.4;
+      const marginY = (maxY - minY) * 0.08 || 0.4;
+      minX -= marginX; maxX += marginX;
+      minY -= marginY; maxY += marginY;
+
+      // Título y Subtítulo estilo R
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 12px var(--font-sans)';
+      ctx.fillText('Plot for determining the Box-Cox transformation', padL, 18);
+
+      ctx.font = '11px var(--font-sans)';
+      ctx.fillStyle = '#1e293b';
+      const subText = `Lambda =  ${lambdaEst.toFixed(4)}     R-squared =  ${r2.toFixed(4)}     Window = ${W}`;
+      ctx.fillText(subText, padL, 34);
+
+      // Fondo Gris ggplot2
+      ctx.fillStyle = '#ebebeb';
+      ctx.fillRect(padL, padT, plotW, plotH);
+
+      // Rejilla Blanca
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      const nGridX = 5;
+      for (let i = 0; i <= nGridX; i++) {
+        const gx = padL + (i / nGridX) * plotW;
+        ctx.beginPath(); ctx.moveTo(gx, padT); ctx.lineTo(gx, padT + plotH); ctx.stroke();
+        const valX = minX + (i / nGridX) * (maxX - minX);
+        ctx.fillStyle = '#475569';
+        ctx.font = '10px var(--font-sans)';
+        ctx.textAlign = 'center';
+        ctx.fillText(valX.toFixed(1), gx, padT + plotH + 13);
+      }
+
+      const nGridY = 4;
+      for (let i = 0; i <= nGridY; i++) {
+        const gy = padT + (i / nGridY) * plotH;
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(padL + plotW, gy); ctx.stroke();
+        const valY = maxY - (i / nGridY) * (maxY - minY);
+        ctx.fillStyle = '#475569';
+        ctx.font = '10px var(--font-sans)';
+        ctx.textAlign = 'right';
+        ctx.fillText(valY.toFixed(1), padL - 6, gy + 3);
+      }
+
+      // Banda de Confianza 95%
+      const nRibbon = 40;
+      const upperPts = [];
+      const lowerPts = [];
+      for (let k = 0; k <= nRibbon; k++) {
+        const xVal = minX + (k / nRibbon) * (maxX - minX);
+        const yHat = intercept + slope * xVal;
+        const seFit = seResid * Math.sqrt((1.0 / K) + (Math.pow(xVal - meanX, 2) / (Sxx || 1)));
+        const xC = padL + (k / nRibbon) * plotW;
+        const yUpC = padT + plotH - (((yHat + 1.96 * seFit) - minY) / (maxY - minY)) * plotH;
+        const yLowC = padT + plotH - (((yHat - 1.96 * seFit) - minY) / (maxY - minY)) * plotH;
+        upperPts.push({ x: xC, y: yUpC });
+        lowerPts.push({ x: xC, y: yLowC });
+      }
+
+      ctx.fillStyle = 'rgba(180, 180, 180, 0.55)';
+      ctx.beginPath();
+      ctx.moveTo(upperPts[0].x, upperPts[0].y);
+      for (let pt of upperPts) ctx.lineTo(pt.x, pt.y);
+      for (let i = lowerPts.length - 1; i >= 0; i--) ctx.lineTo(lowerPts[i].x, lowerPts[i].y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Recta de Regresión Azul
+      ctx.strokeStyle = '#3366ff';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      const x1 = padL;
+      const y1 = padT + plotH - ((intercept + slope * minX - minY) / (maxY - minY)) * plotH;
+      const x2 = padL + plotW;
+      const y2 = padT + plotH - ((intercept + slope * maxX - minY) / (maxY - minY)) * plotH;
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+
+      // Puntos
+      ctx.fillStyle = '#000000';
+      for (let p of pts) {
+        const px = padL + ((p.x - minX) / (maxX - minX)) * plotW;
+        const py = padT + plotH - ((p.y - minY) / (maxY - minY)) * plotH;
+        ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Ejes
+      ctx.fillStyle = '#000000';
+      ctx.font = '11px var(--font-sans)';
+      ctx.textAlign = 'center';
+      ctx.fillText('log.ma', padL + plotW / 2, height - 4);
+
+      ctx.save();
+      ctx.translate(14, padT + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillText('log.sd', 0, 0);
+      ctx.restore();
+    }
+
+    function updateViews() {
+      lambdaDisplay.textContent = `λ = ${STATE.lambda.toFixed(2)}`;
+      lambdaSlider.value = STATE.lambda;
+      lblTransLegend.textContent = `w(t) [λ = ${STATE.lambda.toFixed(2)}]`;
+
+      // Actualizar el botón único de conmutación inteligente
+      const c = CASES[STATE.currentCase];
+      const isOriginal = Math.abs(STATE.lambda - 1.0) < 0.04;
+
+      if (btnToggleOptimal) {
+        if (c.targetLambda === 1.0) {
+          btnToggleIcon.textContent = '✓';
+          btnToggleText.textContent = 'Serie ya homocedástica (λ = 1.0)';
+          btnToggleOptimal.className = 'btn-toggle-switch is-transformed';
+          btnToggleOptimal.style.pointerEvents = 'none';
+        } else if (isOriginal) {
+          btnToggleIcon.textContent = '⚡';
+          btnToggleText.textContent = `Aplicar Recomendado (λ = ${c.targetLambda.toFixed(1)})`;
+          btnToggleOptimal.className = 'btn-toggle-switch';
+          btnToggleOptimal.style.pointerEvents = 'auto';
+        } else {
+          btnToggleIcon.textContent = '↩';
+          btnToggleText.textContent = 'Volver a Original (λ = 1.0)';
+          btnToggleOptimal.className = 'btn-toggle-switch is-transformed';
+          btnToggleOptimal.style.pointerEvents = 'auto';
+        }
+      }
+
+      renderTimeSeries();
+      renderRPlot();
+    }
+
+    // Animación suave de transición de lambda
+    let animInterval = null;
+    function animateLambdaTo(targetVal) {
+      if (animInterval) clearInterval(animInterval);
+      const startVal = STATE.lambda;
+      if (Math.abs(startVal - targetVal) < 0.01) {
+        STATE.lambda = targetVal;
+        updateViews();
+        return;
+      }
+      const totalSteps = 24;
+      let currentStep = 0;
+      animInterval = setInterval(() => {
+        currentStep++;
+        const t = currentStep / totalSteps;
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        STATE.lambda = Math.round((startVal + (targetVal - startVal) * ease) * 100) / 100;
+        updateViews();
+
+        if (currentStep >= totalSteps) {
+          clearInterval(animInterval);
+          animInterval = null;
+          STATE.lambda = targetVal;
+          updateViews();
+        }
+      }, 16);
+    }
+
+    function setCase(caseKey) {
+      STATE.currentCase = caseKey;
+      const c = CASES[caseKey];
+
+      document.querySelectorAll('.step-card').forEach(card => {
+        card.classList.toggle('active', card.getAttribute('data-step') === caseKey);
+      });
+
+      txtCaseName.textContent = c.name;
+      txtCaseDispersion.textContent = c.dispersion;
+      txtCaseSlope.textContent = c.slope;
+      txtTargetLambda.textContent = `λ* = ${c.targetLambda.toFixed(1)}`;
+
+      if (caseKey === 'unif') {
+        caseStrip.classList.add('unification');
+        unificationSection.classList.remove('hidden');
+      } else {
+        caseStrip.classList.remove('unification');
+        unificationSection.classList.add('hidden');
+      }
+
+      // Destacar fila en tabla si aplica
+      document.querySelectorAll('.unification-table tbody tr').forEach(row => {
+        row.classList.toggle('active-row', row.getAttribute('data-jump-step') === caseKey);
+      });
+
+      // Al cambiar de caso, siempre carga la muestra de la semilla maestra óptima (offset = 0)
+      seedOffset = 0;
+      STATE.rawData = generateData(caseKey, seedOffset);
+      // Por defecto cada serie arranca en Original (λ = 1.0)
+      STATE.lambda = 1.0;
+      STATE.evalTransformed = false;
+      chkEvalTransformed.checked = false;
+
+      updateViews();
+    }
+
+    // EVENTOS
+    lambdaSlider.addEventListener('input', (e) => {
+      if (animInterval) clearInterval(animInterval);
+      STATE.lambda = parseFloat(e.target.value);
+      updateViews();
+    });
+
+    // Conmutador Inteligente Único
+    btnToggleOptimal.addEventListener('click', () => {
+      const c = CASES[STATE.currentCase];
+      if (c.targetLambda === 1.0) return;
+      const isOriginal = Math.abs(STATE.lambda - 1.0) < 0.04;
+      if (isOriginal) {
+        animateLambdaTo(c.targetLambda);
+      } else {
+        animateLambdaTo(1.0);
+      }
+    });
+
+    document.querySelectorAll('.step-card').forEach(card => {
+      card.addEventListener('click', () => {
+        setCase(card.getAttribute('data-step'));
+      });
+    });
+
+    document.querySelectorAll('.unification-table tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        setCase(row.getAttribute('data-jump-step'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    btnRegenerateSample.addEventListener('click', () => {
+      seedOffset++;
+      STATE.rawData = generateData(STATE.currentCase, seedOffset);
+      updateViews();
+    });
+
+    chkEvalTransformed.addEventListener('change', (e) => {
+      STATE.evalTransformed = e.target.checked;
+      renderRPlot();
+    });
+
+    window.addEventListener('resize', () => {
+      updateViews();
+    });
+
+    // ARRANQUE (Inicia en Caso 1 por defecto en λ = 1.0 con la semilla maestra 5275)
+    setCase('log');
+
+  </script>
+</body>
+</html>

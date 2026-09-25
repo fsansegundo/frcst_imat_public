@@ -137,15 +137,15 @@ head(stats::lag(x1, n = 1))
 Now we can plot the ccf values. We use `abline` to add some red dashed lines to help you identify the first lags (on both sides of zero)
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = x1, x = x1_lag1)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x1_lag1, y = x1, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 Alternatively, you can use this (without setting the NAs to 0)
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = x1, x = Lag(x1, shift = 1), na.action = na.pass)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = Lag(x1, shift = 1), y = x1, na.action = na.pass, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 Either way, the ccf plot shows that (as expected) x1(t) has cross correlation 
@@ -154,20 +154,15 @@ equal to 1 with its lag x1(t - 1).
 **Notes about ccf:**  
 
  + In general **the lag k value returned by `ccf(x, y)` estimates the correlation
-  between `x[t+k]` and `y[t]`**. When you apply it to the lag of x1, that is when
-  `y[t] = x1[t]` and `x[t] = x1[t - 1]` then the value k units to the right
-  shows the correlation between `x1[t - 1 + k]` and `x1[t]`. In this example, 
-  where x1 is white noise the ony non-zero value occurs at k = 1.
+  between `x[t+k]` and `y[t]`**. When you apply it to the lag of x1, that is when `x[t] = x1[t - 1]` and  `y[t] = x1[t]` then the value k units to the right  shows the correlation between `x1[t - 1 + k]` and `x1[t]`. In this example,   where x1 is white noise the ony non-zero value occurs at k = 1.
  + You can use `print(ccf(...))` to see the numeric values of the ccf
  
-If we use `ccf` to explore the cross correlation between the output and input 
-of this example we get a clear indication that they are correlated for t = 0.
-This is a consequence of the equation model, but the (lack of) autocorrelation
+If we use `ccf` to explore the cross correlation between the output and input of this example we get a clear indication that they are correlated for t = 0. This is a consequence of the equation model, but the (lack of) autocorrelation
 of x1 also plays a role here.
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = y1, x = x1)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x1, y = y1, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 
@@ -195,8 +190,8 @@ in this example there is no cross correlation between the residuals of the
 model and x1 (recall x1 is white noise, so it has no autocorrelation).
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = residuals(lm1.fit), x = x1)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x1, y = residuals(lm1.fit), lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 #### Transfer function model 
@@ -251,8 +246,8 @@ input with the residuals**. If the model is well fitted there should be no
 cross correlation left (as in this case).
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = residuals(arima1.fit), x = x1)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x1, y = residuals(arima1.fit), lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 ## Second example
@@ -309,8 +304,8 @@ If we examine the ccf between the input x2 and the output we get a much more
 complicated picture:
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = y2, x = x2)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x2, y = y2, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 **Exercise:** Why? What is different in this example?
@@ -334,8 +329,8 @@ But we have an additional problem. There is cross correlation between the
 residuals and the input:
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = residuals(lm2.fit), x = x2)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x2, y = residuals(lm2.fit), lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 ### Transfer function model 
@@ -376,8 +371,8 @@ And finally we **check the cross correlation between the residuals and
 the input**. 
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = residuals(arima2.fit), x = x2)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x2, y = residuals(arima2.fit), lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 As you can see, this model passes all our checks.
@@ -451,8 +446,8 @@ simplify the code we will get short named versions of the columns of the
 (multi)time series:
 
 ```{r fig.width=12, fig.height=4}
-y4 <- fdata4[,"y4"]
 x2 <- fdata4[,"x2"]
+y4 <- fdata4[,"y4"]
 x2lg3 <- fdata4[,"x2lg3"]
 ```
 
@@ -462,8 +457,8 @@ Now, one of the first ways to look for b that you may consider is to look at
 the ccf between input and output:
 
 ```{r fig.width=12, fig.height=4}
-ccf(y = y4, x = x2, lwd=2)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x2, y = y4, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 In this very simple example we can still notice that b = 3 is *special* in a
@@ -564,7 +559,7 @@ and the input variable
 ```{r fig.width=12, fig.height=4}
 res <- residuals(arima.fit)
 res[is.na(res)] <- 0
-ccf(y = res, x = x2)
+ccf(x = x2, y = res, lwd=2)
 ```
 
 ### Prewhitening
@@ -585,15 +580,35 @@ Fortunately there is a function in TSA that performs all this process for
 us and directly outputs the final ccf:
 
 ```{r fig.width=12, fig.height=4}
-prewhiten(y4, x2, main="Prewhitening of y4 & x2")
-abline(v = -5:5, col="orange", lty = 2)
+# prewhiten(y4, x2, main="Prewhitening of y4 & x2", lwd=2)
+prewhiten(x = x2, y = y4, main="Prewhitening of y4 & x2", lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
 
 The result is very clear in this example. You should compare this to the 
 direct ccf that we already obtained before for this example:
 
 ```{r fig.width=12, fig.height=4}
-ccf(y4, x2)
-abline(v = -5:5, col="orange", lty = 2)
+ccf(x = x2, y = y4, lwd=2)
+abline(v = -5:5, col="red", lty = 2)
 ```
+
+
+```{r echo=FALSE, eval=FALSE}
+# x2lg4 <- Lag(x2lg3, shift = 1)
+# x2lg4[1] <- 0
+# # fdata4[,"ar_noise"]
+# # x2lg4
+# y5 <- 0.7 * x2lg3 + 0.9 * x2lg4 + fdata4[,"ar_noise"]
+# # y5 <- subset(y5, start = 2)
+# # x2 <- subset(x2, start = 2)
+# head(y5)
+# head(x2)
+# ccf(x = x2, y = y5, lwd=2)
+# prewhiten(x = x2, y = y5)
+# # abline(v = -5:5, col="red", lty = 2, lwd=1)
+# abline(v = 0, col="cyan", lty = 2, lwd=2)
+```
+
+
 

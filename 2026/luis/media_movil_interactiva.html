@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medias Móviles Centradas • Descomposición de Series Temporales</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      
+      --color-data: #2563eb;       /* Azul serie original y(t) */
+      --color-tau: #e11d48;        /* Rojo/carmín tendencia-ciclo τ(t) */
+      --color-tau-subtle: rgba(225, 29, 72, 0.08);
+      --color-window: rgba(37, 99, 235, 0.05);
+      --color-window-border: rgba(37, 99, 235, 0.35);
+      --color-captured: #d97706;   /* Ámbar muestras en ventana */
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 1.5rem 2.25rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Cabecera Minimalista */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 1.15rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-main h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .badge-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 0.18rem 0.55rem;
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+
+    .header-main p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .header-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn-tool {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+    .btn-tool:hover {
+      background: var(--bg-subtle);
+      border-color: var(--text-muted);
+    }
+
+    kbd {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Grid Principal */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* Barra de Controles Minimalista */
+    .controls-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem 1.8rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      align-items: center;
+    }
+
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .ctrl-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .pill-val {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--color-data);
+    }
+
+
+    select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.42rem 1.8rem 0.42rem 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      background-size: 0.9rem;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--color-data);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      width: 140px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-data);
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+
+    .btn-action {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 0.42rem 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+
+    .btn-action.toggle-off {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border-style: dashed;
+    }
+
+    .btn-action:hover {
+      border-color: var(--text-muted);
+    }
+
+    .btn-action.primary {
+      background: var(--text);
+      color: #ffffff;
+      border-color: var(--text);
+    }
+
+    .btn-action.active-pause {
+      background: var(--color-tau);
+      color: #ffffff;
+      border-color: var(--color-tau);
+    }
+
+    /* Reproducción y Tiempo */
+    .playback-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.35rem 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .time-badge {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-data);
+      min-width: 55px;
+      text-align: right;
+    }
+
+    /* Contenedor del Gráfico */
+    .chart-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    canvas#chartCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      padding: 0 0.2rem;
+    }
+
+    .legend-inline {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.83rem;
+    }
+
+    .leg-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .leg-line {
+      width: 16px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* Columna Derecha: Inspección Didáctica según Diapositiva */
+    .right-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.35rem;
+    }
+
+    .math-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .math-formula-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .main-metric {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.2rem;
+    }
+
+    .metric-tau {
+      font-family: var(--font-mono);
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .metric-status {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-status.valid {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .metric-status.edge {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .metric-sub {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.2rem;
+    }
+
+    /* Caja de Fórmula Estilo Diapositiva */
+    .slide-formula-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.95rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .formula-tagline {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-data);
+    }
+
+    .formula-math-display {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .formula-math-sub {
+      font-family: var(--font-mono);
+      font-size: 0.81rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      border-top: 1px dashed var(--border);
+      padding-top: 0.5rem;
+      word-break: break-word;
+    }
+
+    /* Visualización del Kernel Centrado */
+    .kernel-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .kernel-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .kernel-bars-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 64px;
+      padding: 0 4px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .k-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .k-bar-pill {
+      width: 100%;
+      background: var(--color-data);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.15s ease;
+    }
+
+    .k-bar-pill.edge-point {
+      background: #93c5fd; /* Azul suave para pesos 1/2k */
+      border: 1px dashed #2563eb;
+      border-bottom: none;
+    }
+
+    .k-bar-pill.center-point {
+      background: var(--color-tau);
+    }
+
+    .k-col-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+
+    /* Valores de Pesos en Barras */
+    .k-weight-val {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* Tooltip */
+    #chartTooltip {
+      position: absolute;
+      display: none;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      pointer-events: none;
+      z-index: 10;
+      transform: translate(-50%, -125%);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecera Minimalista -->
+  <header>
+    <div class="header-main">
+      <h1>
+        Medias Móviles Centradas
+        <span class="badge-tag" id="headerTag">Descomposición de Series</span>
+      </h1>
+      <p>Estimación de la componente de tendencia-ciclo: orden impar \(MA_k\) y orden par centrado \(MA_{2 \times k}\).</p>
+    </div>
+
+    <div class="header-tools">
+      <div style="font-size:0.78rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:0.3rem;">
+        <kbd>←</kbd> <kbd>→</kbd> <kbd>Espacio</kbd>
+      </div>
+      <button class="btn-tool" id="btnFullscreen" title="Pantalla completa para proyector">
+        ⛶ Pantalla Completa
+      </button>
+    </div>
+  </header>
+
+  <!-- Grid de Trabajo -->
+  <div class="dashboard-grid">
+
+    <!-- Columna Izquierda: Parámetros y Gráfico -->
+    <div class="left-section">
+      
+      <!-- Controles Minimalistas en una sola fila -->
+      <div class="controls-strip">
+        
+        <!-- Orden k1 (impares y pares) -->
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="windowSize">
+            <span>Orden k</span>
+            <span id="kLabel" class="pill-val">k = 4 (MA₂ₓ₄)</span>
+          </label>
+          <input type="range" id="windowSize" min="2" max="14" value="4" step="1">
+        </div>
+
+        <!-- Nivel de Ruido -->
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="noiseSlider">
+            <span>Ruido</span>
+            <span id="noiseLabel" class="pill-val">σ = 10</span>
+          </label>
+          <input type="range" id="noiseSlider" min="0" max="25" value="10" step="1">
+        </div>
+
+
+        <!-- Serie de prueba -->
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="datasetSelect">Serie y(t)</label>
+          <select id="datasetSelect">
+            <option value="trend_noise">1. Tendencia con Ruido</option>
+            <option value="sine">2. Onda Estacional (Seno)</option>
+            <option value="step">3. Escalón Brusco</option>
+            <option value="outlier_demo">4. Pico Aislado (Outlier)</option>
+            <option value="random_walk">5. Paseo Aleatorio</option>
+          </select>
+        </div>
+
+        <!-- Botón regenerar muestra -->
+        <button class="btn-action" id="btnRegenerate" title="Generar nueva muestra estocástica">
+          🎲 Nueva Serie
+        </button>
+
+        <!-- Botón Ocultar/Mostrar Tendencia -->
+        <button class="btn-action" id="btnToggleTrend" title="Ocultar o mostrar la tendencia estimada (tecla T)">
+          <span id="trendBtnIcon">👁️</span> <span id="trendBtnText">Ocultar Tendencia</span>
+        </button>
+
+        <!-- Barra de Reproducción -->
+        <div class="playback-bar">
+          <button class="btn-action primary" id="btnPlayPause" style="padding:0.35rem 0.65rem;">
+            <span id="playText">▶ Iniciar</span>
+          </button>
+          <button class="btn-action" id="btnStepPrev" title="Paso anterior" style="padding:0.35rem 0.55rem;">⏮</button>
+          <button class="btn-action" id="btnStepNext" title="Paso siguiente" style="padding:0.35rem 0.55rem;">⏭</button>
+
+          <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-left:0.2rem;">t:</span>
+          <input type="range" id="timeSlider" min="0" max="39" value="16" style="flex:1;">
+          <span id="currentTimeBadge" class="time-badge">t = 16</span>
+        </div>
+
+      </div>
+
+      <!-- Canvas y Gráfica -->
+      <div class="chart-panel">
+        <div class="canvas-wrap" id="chartContainer">
+          <canvas id="chartCanvas"></canvas>
+          <div id="chartTooltip"></div>
+        </div>
+
+        <div class="chart-footer">
+          <div class="legend-inline">
+            <div class="leg-item">
+              <div class="leg-dot" style="background: var(--color-data);"></div>
+              <span>Observación y(t)</span>
+            </div>
+            <div class="leg-item" id="legendTrendItem" style="cursor:pointer;" title="Click para alternar tendencia">
+              <div class="leg-line" style="background: var(--color-tau);"></div>
+              <span id="legendKLabel">Tendencia τ(t) con k</span>
+            </div>
+            <div class="leg-item">
+              <div class="leg-dot" style="background: var(--color-captured);"></div>
+              <span>Muestras ponderadas</span>
+            </div>
+          </div>
+
+          <span>🖐️ Arrastra cualquier punto azul para modificar \(y(t)\) en vivo.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Columna Derecha: Inspección Didáctica -->
+    <div class="right-section">
+      
+      <!-- Resultado τ(t) Principal -->
+      <div class="math-summary">
+        <div class="math-formula-title">
+          <span id="estimatorName">Estimador Tendencia-Ciclo</span>
+          <span class="metric-status valid" id="edgeStatus">Ventana Completa</span>
+        </div>
+        <div class="main-metric">
+          <span style="font-size:1.3rem; font-weight:700; color:var(--text-muted);" id="tauSymbolLabel">τ(16) =</span>
+          <span class="metric-tau" id="valTau">0.00</span>
+        </div>
+        <div class="metric-sub">
+          <span>Dato original: <strong id="valYt" style="color:var(--text);">0.00</strong></span>
+          <span>Residuo e<sub>t</sub>: <strong id="valResidual" style="color:var(--text);">0.00</strong></span>
+        </div>
+      </div>
+
+      <!-- Fórmula Didáctica -->
+      <div class="slide-formula-box">
+        <div class="formula-tagline" id="formulaTagline">
+          Filtro Centrado Par: MA₂ₓ₄
+        </div>
+        <div class="formula-math-display" id="slideFormulaHeader">
+          MA₂ₓ₄(t) = [y(t-2) + 2y(t-1) + 2y(t) + 2y(t+1) + y(t+2)] / 8
+        </div>
+        <div class="formula-math-sub" id="slideFormulaExpanded">
+          Cargando ecuación...
+        </div>
+      </div>
+
+      <!-- Distribución de Pesos w_j Centrada -->
+      <div class="kernel-flow">
+        <div class="kernel-title">
+          <span id="kernelTitleLabel">Estructura de Pesos Centrados w<sub>j</sub></span>
+          <span style="color:var(--color-data); font-family:var(--font-mono); font-weight:700;" id="sumWeightsLabel">Σ w = 1.000</span>
+        </div>
+        <div class="kernel-bars-row" id="kernelBarsRow">
+          <!-- Rellenado por JS -->
+        </div>
+      </div>
+
+
+      
+
+    </div>
+
+  </div>
+
+  <script>
+    // --- ESTADO GLOBAL ---
+    const NUM_POINTS = 40;
+    let rawData = [];
+    let currentT = 16;
+    let isPlaying = false;
+    let playInterval = null;
+    let draggingPointIndex = -1;
+    let showTrend = true;
+
+    // Elementos DOM
+    const canvas = document.getElementById('chartCanvas');
+    const ctx = canvas.getContext('2d');
+    const chartTooltip = document.getElementById('chartTooltip');
+
+    const windowSizeInput = document.getElementById('windowSize');
+    const kLabel = document.getElementById('kLabel');
+    const noiseSlider = document.getElementById('noiseSlider');
+    const noiseLabel = document.getElementById('noiseLabel');
+    const legendKLabel = document.getElementById('legendKLabel');
+    const datasetSelect = document.getElementById('datasetSelect');
+    const btnRegenerate = document.getElementById('btnRegenerate');
+    const btnToggleTrend = document.getElementById('btnToggleTrend');
+
+    const timeSlider = document.getElementById('timeSlider');
+    const currentTimeBadge = document.getElementById('currentTimeBadge');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playText = document.getElementById('playText');
+    const btnStepPrev = document.getElementById('btnStepPrev');
+    const btnStepNext = document.getElementById('btnStepNext');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+
+    // Panel Didáctico
+    const edgeStatus = document.getElementById('edgeStatus');
+    const estimatorName = document.getElementById('estimatorName');
+    const tauSymbolLabel = document.getElementById('tauSymbolLabel');
+    const valTau = document.getElementById('valTau');
+    const valYt = document.getElementById('valYt');
+    const valResidual = document.getElementById('valResidual');
+    const formulaTagline = document.getElementById('formulaTagline');
+    const slideFormulaHeader = document.getElementById('slideFormulaHeader');
+    const slideFormulaExpanded = document.getElementById('slideFormulaExpanded');
+    const kernelTitleLabel = document.getElementById('kernelTitleLabel');
+    const sumWeightsLabel = document.getElementById('sumWeightsLabel');
+    const kernelBarsRow = document.getElementById('kernelBarsRow');
+    
+
+    // --- GENERACIÓN DE DATOS ---
+    let noiseSamples = [];
+
+    function resetNoiseSamples() {
+      noiseSamples = [];
+      for (let i = 0; i < NUM_POINTS; i++) {
+        noiseSamples.push((Math.random() - 0.5));
+      }
+    }
+
+    function generateData(keepNoise = false) {
+      if (!keepNoise || noiseSamples.length !== NUM_POINTS) {
+        resetNoiseSamples();
+      }
+      const type = datasetSelect.value;
+      const noiseAmp = parseFloat(noiseSlider ? noiseSlider.value : 10);
+      rawData = [];
+      let currentRw = 50;
+
+      for (let i = 0; i < NUM_POINTS; i++) {
+        const n = noiseSamples[i] * noiseAmp;
+        let val = 50;
+        if (type === 'trend_noise') {
+          val = 26 + i * 1.4 + n;
+        } else if (type === 'sine') {
+          val = 52 + 24 * Math.sin((i / NUM_POINTS) * Math.PI * 3.5) + (n * 0.8);
+        } else if (type === 'step') {
+          val = (i < 18 ? 34 : 70) + (n * 0.6);
+        } else if (type === 'outlier_demo') {
+          val = 42 + i * 0.4 + (n * 0.35);
+          if (i === 18) val += 38; // Pico anómalo
+        } else if (type === 'random_walk') {
+          currentRw += noiseSamples[i] * (noiseAmp * 0.9);
+          val = currentRw;
+        }
+        rawData.push(parseFloat(val.toFixed(2)));
+      }
+    }
+
+    // --- ESPECIFICACIÓN DEL FILTRO CENTRADO (PAR vs IMPAR) ---
+    // Si k es impar: orden k, m = (k-1)/2, pesos idénticos 1/k en [-m, m]
+    // Si k es par: MA 2xk, m = k/2, pesos [1, 2, ..., 2, 1] / (2k) en [-m, m]
+    function getFilterDef(k) {
+      const isOdd = k % 2 !== 0;
+      if (isOdd) {
+        const m = (k - 1) / 2;
+        const weights = Array(k).fill(1 / k);
+        const fractions = Array(k).fill(`1/${k}`);
+        const jValues = [];
+        for (let j = -m; j <= m; j++) jValues.push(j);
+        return {
+          isOdd: true,
+          k,
+          m,
+          name: `MA${k}`,
+          title: `Media Móvil Simple Centrada: MA${k}`,
+          tag: `k = ${k} (impar, m = ${m})`,
+          jValues,
+          weights,
+          fractions,
+          windowSpan: k
+        };
+      } else {
+        const m = k / 2;
+        const totalWeight = 2 * k; // Denominador común
+        const weights = [];
+        const fractions = [];
+        const jValues = [];
+        for (let j = -m; j <= m; j++) {
+          jValues.push(j);
+          const isEndpoint = (j === -m || j === m);
+          const numer = isEndpoint ? 1 : 2;
+          weights.push(numer / totalWeight);
+          fractions.push(isEndpoint ? `1/${totalWeight}` : `2/${totalWeight}`);
+        }
+        return {
+          isOdd: false,
+          k,
+          m,
+          name: `MA2×${k}`,
+          title: `Media Móvil Centrada Par: MA2×${k}`,
+          tag: `k = ${k} (par, MA2×${k}, m = ${m})`,
+          jValues,
+          weights,
+          fractions,
+          windowSpan: k + 1
+        };
+      }
+    }
+
+    // Ventana alrededor de t
+    function getActiveWindow(t, fDef) {
+      const m = fDef.m;
+      const items = [];
+      for (let idx = 0; idx < fDef.jValues.length; idx++) {
+        const j = fDef.jValues[idx];
+        const timeIndex = t + j;
+        if (timeIndex >= 0 && timeIndex < NUM_POINTS) {
+          items.push({
+            j,
+            timeIndex,
+            weight: fDef.weights[idx],
+            fraction: fDef.fractions[idx]
+          });
+        }
+      }
+      return {
+        m,
+        items,
+        isComplete: items.length === fDef.windowSpan
+      };
+    }
+
+    // Calcular serie completa para todo t
+    function computeSeries(kVal) {
+      const fDef = getFilterDef(kVal);
+      const series = [];
+
+      for (let t = 0; t < NUM_POINTS; t++) {
+        const { items, isComplete } = getActiveWindow(t, fDef);
+        if (!isComplete) {
+          series.push(null);
+        } else {
+          let sum = 0;
+          for (let i = 0; i < items.length; i++) {
+            sum += rawData[items[i].timeIndex] * items[i].weight;
+          }
+          series.push(parseFloat(sum.toFixed(2)));
+        }
+      }
+      return series;
+    }
+
+    // --- ACTUALIZACIÓN DE LA INSPECCIÓN DIDÁCTICA ---
+    function updateInspector(k1, tau1Series) {
+      const fDef = getFilterDef(k1);
+      const { m, items, isComplete } = getActiveWindow(currentT, fDef);
+      const rawCurrent = rawData[currentT];
+
+      valYt.textContent = rawCurrent.toFixed(2);
+      estimatorName.textContent = fDef.name;
+      tauSymbolLabel.textContent = `${fDef.name}(${currentT}) =`;
+
+      // Cabecera según si es par o impar
+      if (fDef.isOdd) {
+        formulaTagline.textContent = `Filtro Centrado Impar: ${fDef.name} (pesos idénticos 1/${fDef.k})`;
+        slideFormulaHeader.innerHTML = `τ(t) = <sup>1</sup>/<sub>${fDef.k}</sub> ∑<sub>j=-${m}</sub><sup>${m}</sup> y(t + j)`;
+      } else {
+        formulaTagline.textContent = `Filtro Centrado Par: ${fDef.name} (promedio de dos MA${fDef.k})`;
+        slideFormulaHeader.innerHTML = `${fDef.name}(t) = <sup>1</sup>/<sub>${2*fDef.k}</sub> [ y(t-${m}) + 2∑<sub>j=-${m-1}</sub><sup>${m-1}</sup> y(t+j) + y(t+${m}) ]`;
+      }
+
+      if (!isComplete) {
+        edgeStatus.textContent = `Efecto Borde (${items.length}/${fDef.windowSpan})`;
+        edgeStatus.className = 'metric-status edge';
+        valTau.textContent = '--';
+        valResidual.textContent = '--';
+
+        slideFormulaExpanded.innerHTML = `⚠️ <strong>Punto en el extremo de la serie (t = ${currentT}):</strong><br>` +
+          `Para centrar con <em>${fDef.name}</em> se requieren observaciones hasta <em>t ± ${m}</em>.<br>` +
+          (currentT < m ? `Faltan datos pasados (t - ${m} = ${currentT - m} < 0).` : `Faltan datos futuros (t + ${m} = ${currentT + m} ≥ ${NUM_POINTS}).`);
+
+        kernelBarsRow.innerHTML = `<span style="font-size:0.75rem; color:var(--text-muted); margin:auto;">Ventana incompleta en el extremo</span>`;
+        
+        return;
+      }
+
+      edgeStatus.textContent = 'Ventana Completa';
+      edgeStatus.className = 'metric-status valid';
+
+      const currentTau = tau1Series[currentT];
+      valTau.textContent = currentTau !== null ? currentTau.toFixed(2) : '--';
+
+      const res = (rawCurrent - currentTau).toFixed(2);
+      valResidual.textContent = res >= 0 ? `+${res}` : res;
+
+      // Expansión didáctica idéntica a las diapositivas
+      if (fDef.isOdd) {
+        const termsY = items.map(it => `y(${it.timeIndex})`).join(' + ');
+        const termsVals = items.map(it => rawData[it.timeIndex].toFixed(1)).join(' + ');
+        slideFormulaExpanded.innerHTML = `<strong>Expansión en t = ${currentT}:</strong><br>` +
+          `τ(${currentT}) = <sup>1</sup>/<sub>${fDef.k}</sub> (${termsY})<br>` +
+          `= <sup>1</sup>/<sub>${fDef.k}</sub> (${termsVals}) = <strong>${currentTau.toFixed(2)}</strong>`;
+      } else {
+        // Formato de la diapositiva: (y(1) + 2y(2) + 2y(3) + 2y(4) + y(5)) / 8
+        const termsY = items.map((it, idx) => {
+          const mult = (idx === 0 || idx === items.length - 1) ? '' : '2';
+          return `${mult}y(${it.timeIndex})`;
+        }).join(' + ');
+
+        const termsVals = items.map((it, idx) => {
+          const mult = (idx === 0 || idx === items.length - 1) ? '' : '2·';
+          return `${mult}${rawData[it.timeIndex].toFixed(1)}`;
+        }).join(' + ');
+
+        slideFormulaExpanded.innerHTML = `<strong>Expansión en t = ${currentT}:</strong><br>` +
+          `${fDef.name}(${currentT}) = [ ${termsY} ] / ${2 * fDef.k}<br>` +
+          `= [ ${termsVals} ] / ${2 * fDef.k} = <strong>${currentTau.toFixed(2)}</strong>`;
+      }
+
+      // Gráfico de Barras del Kernel Centrado
+      let barsHtml = '';
+      const maxW = Math.max(...fDef.weights);
+      const MAX_BAR_PX = 36; // Altura máxima en píxeles para peso completo
+
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        // Altura proporcional exacta: los pesos a la mitad (1/2k) tendrán exactamente 18px frente a 36px
+        const barH = Math.max(6, Math.round((it.weight / maxW) * MAX_BAR_PX));
+        const isCenter = it.j === 0;
+        const isEdge = (!fDef.isOdd && (it.j === -m || it.j === m));
+
+        barsHtml += `
+          <div class="k-col" title="j = ${it.j > 0 ? '+' + it.j : it.j} | Peso = ${it.fraction} (${it.weight.toFixed(3)})">
+            <span class="k-weight-val">${it.fraction}</span>
+            <div class="k-bar-pill ${isCenter ? 'center-point' : (isEdge ? 'edge-point' : '')}" style="height: ${barH}px;"></div>
+            <span class="k-col-label">${it.j > 0 ? '+' + it.j : it.j}</span>
+          </div>
+        `;
+      }
+      kernelBarsRow.innerHTML = barsHtml;
+      sumWeightsLabel.textContent = `Σ w = 1.000`;
+    }
+
+    // --- COORDENADAS Y ESCALA ---
+    let plotMetrics = null;
+
+    function getMetrics() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const padding = { top: 32, right: 30, bottom: 40, left: 48 };
+      const plotW = width - padding.left - padding.right;
+      const plotH = height - padding.top - padding.bottom;
+
+      let min = Math.min(...rawData);
+      let max = Math.max(...rawData);
+      const span = max - min || 10;
+      const minY = Math.floor(min - span * 0.15);
+      const maxY = Math.ceil(max + span * 0.15);
+
+      return { width, height, padding, plotW, plotH, minY, maxY };
+    }
+
+    function toCoords(idx, val, m) {
+      const x = m.padding.left + (idx / (NUM_POINTS - 1)) * m.plotW;
+      const y = m.padding.top + (1 - (val - m.minY) / (m.maxY - m.minY)) * m.plotH;
+      return { x, y };
+    }
+
+    function fromCoords(px, py, m) {
+      const idx = Math.round(((px - m.padding.left) / m.plotW) * (NUM_POINTS - 1));
+      const val = m.minY + (1 - (py - m.padding.top) / m.plotH) * (m.maxY - m.minY);
+      return {
+        idx: Math.max(0, Math.min(NUM_POINTS - 1, idx)),
+        val: parseFloat(val.toFixed(2))
+      };
+    }
+
+    // --- RENDERIZADO DEL GRÁFICO ---
+    function renderChart() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+
+      const m = getMetrics();
+      plotMetrics = m;
+      ctx.clearRect(0, 0, m.width, m.height);
+
+      const k1 = parseInt(windowSizeInput.value, 10);
+      const fDef1 = getFilterDef(k1);
+      const tau1Series = computeSeries(k1);
+
+      
+
+      const { m: halfM, items, isComplete } = getActiveWindow(currentT, fDef1);
+
+      // 1. Rejilla y Ejes Minimalistas
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px ' + getComputedStyle(document.body).getPropertyValue('--font-mono');
+      ctx.textAlign = 'right';
+
+      const ySteps = 5;
+      for (let i = 0; i <= ySteps; i++) {
+        const val = m.minY + (i / ySteps) * (m.maxY - m.minY);
+        const pt = toCoords(0, val, m);
+        ctx.beginPath();
+        ctx.moveTo(m.padding.left, pt.y);
+        ctx.lineTo(m.width - m.padding.right, pt.y);
+        ctx.stroke();
+        ctx.fillText(val.toFixed(0), m.padding.left - 8, pt.y + 4);
+      }
+
+      ctx.textAlign = 'center';
+      for (let i = 0; i < NUM_POINTS; i += 5) {
+        const pt = toCoords(i, m.minY, m);
+        ctx.beginPath();
+        ctx.moveTo(pt.x, m.padding.top);
+        ctx.lineTo(pt.x, m.height - m.padding.bottom);
+        ctx.stroke();
+        ctx.fillText(`t=${i}`, pt.x, m.height - m.padding.bottom + 18);
+      }
+
+      // 2. Ventana Centrada Activa
+      if (items.length > 0) {
+        const firstPt = toCoords(items[0].timeIndex, 0, m);
+        const lastPt = toCoords(items[items.length - 1].timeIndex, 0, m);
+        const stepW = m.plotW / (NUM_POINTS - 1);
+        const xStart = firstPt.x - stepW * 0.45;
+        const xEnd = lastPt.x + stepW * 0.45;
+        const wBox = xEnd - xStart;
+
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.05)';
+        ctx.fillRect(xStart, m.padding.top, wBox, m.plotH);
+
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.35)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(xStart, m.padding.top, wBox, m.plotH);
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#2563eb';
+        ctx.font = '600 11px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Ventana ${fDef1.name} [t - ${halfM} .. t + ${halfM}]`, (xStart + xEnd) / 2, m.padding.top - 10);
+      }
+
+      // 3. Serie Original y(t)
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let i = 0; i < NUM_POINTS; i++) {
+        const pt = toCoords(i, rawData[i], m);
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      }
+      ctx.stroke();
+
+      // Puntos y(t)
+      const activeIndices = new Set(items.map(it => it.timeIndex));
+      for (let i = 0; i < NUM_POINTS; i++) {
+        const pt = toCoords(i, rawData[i], m);
+        const isInWindow = activeIndices.has(i);
+
+        ctx.beginPath();
+        if (isInWindow) {
+          ctx.arc(pt.x, pt.y, 5.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#d97706';
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#d97706';
+          ctx.font = 'bold 10px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(rawData[i].toFixed(1), pt.x, pt.y - 9);
+        } else {
+          ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#2563eb';
+          ctx.fill();
+        }
+      }
+
+      // 5. Curva de Tendencia Principal con k1 (condicional)
+      if (showTrend) {
+        ctx.strokeStyle = '#e11d48';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        let started1 = false;
+        for (let i = 0; i < NUM_POINTS; i++) {
+          if (tau1Series[i] !== null) {
+            const pt = toCoords(i, tau1Series[i], m);
+            if (!started1) {
+              ctx.moveTo(pt.x, pt.y);
+              started1 = true;
+            } else {
+              ctx.lineTo(pt.x, pt.y);
+            }
+          }
+        }
+        ctx.stroke();
+
+        for (let i = 0; i < NUM_POINTS; i++) {
+          if (tau1Series[i] !== null) {
+            const pt = toCoords(i, tau1Series[i], m);
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 3.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#e11d48';
+            ctx.fill();
+          }
+        }
+      }
+
+      // 6. Línea vertical de tiempo actual t
+      const curPt = toCoords(currentT, 0, m);
+      ctx.strokeStyle = showTrend ? 'rgba(225, 29, 72, 0.4)' : 'rgba(37, 99, 235, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(curPt.x, m.padding.top);
+      ctx.lineTo(curPt.x, m.height - m.padding.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Punto central estimado (solo si se muestra tendencia)
+      if (showTrend && tau1Series[currentT] !== null) {
+        const tauPt = toCoords(currentT, tau1Series[currentT], m);
+        ctx.beginPath();
+        ctx.arc(tauPt.x, tauPt.y, 9, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(225, 29, 72, 0.15)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(tauPt.x, tauPt.y, 5.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#e11d48';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Actualizar cálculo lateral
+      updateInspector(k1, tau1Series);
+    }
+
+    // --- INTERACCIÓN Y EDICIÓN ---
+    function getNearestPoint(x, y) {
+      if (!plotMetrics) return -1;
+      let nearest = -1;
+      let minD = 25;
+      for (let i = 0; i < NUM_POINTS; i++) {
+        const pt = toCoords(i, rawData[i], plotMetrics);
+        const dist = Math.hypot(pt.x - x, pt.y - y);
+        if (dist < minD) {
+          minD = dist;
+          nearest = i;
+        }
+      }
+      return nearest;
+    }
+
+    function onPointerDown(x, y) {
+      const idx = getNearestPoint(x, y);
+      if (idx !== -1) {
+        draggingPointIndex = idx;
+        setTime(idx);
+        canvas.style.cursor = 'grabbing';
+      }
+    }
+
+    function onPointerMove(x, y) {
+      if (!plotMetrics) return;
+
+      if (draggingPointIndex !== -1) {
+        const clampedY = Math.max(plotMetrics.padding.top, Math.min(canvas.clientHeight - plotMetrics.padding.bottom, y));
+        const res = fromCoords(0, clampedY, plotMetrics);
+        rawData[draggingPointIndex] = res.val;
+        renderChart();
+        showTooltip(x, clampedY, `t = ${draggingPointIndex} | y = ${res.val.toFixed(2)}`);
+      } else {
+        const hIdx = getNearestPoint(x, y);
+        if (hIdx !== -1) {
+          canvas.style.cursor = 'grab';
+          const pt = toCoords(hIdx, rawData[hIdx], plotMetrics);
+          showTooltip(pt.x, pt.y, `t = ${hIdx} | y = ${rawData[hIdx].toFixed(2)}`);
+        } else {
+          canvas.style.cursor = 'crosshair';
+          hideTooltip();
+        }
+      }
+    }
+
+    function onPointerUp() {
+      if (draggingPointIndex !== -1) {
+        draggingPointIndex = -1;
+        canvas.style.cursor = 'crosshair';
+        hideTooltip();
+      }
+    }
+
+    function showTooltip(x, y, text) {
+      chartTooltip.textContent = text;
+      chartTooltip.style.display = 'block';
+      chartTooltip.style.left = `${x}px`;
+      chartTooltip.style.top = `${y}px`;
+    }
+
+    function hideTooltip() {
+      chartTooltip.style.display = 'none';
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      const r = canvas.getBoundingClientRect();
+      onPointerDown(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      onPointerMove(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    window.addEventListener('mouseup', onPointerUp);
+
+    // Táctil
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        const r = canvas.getBoundingClientRect();
+        onPointerDown(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (draggingPointIndex !== -1 && e.touches.length === 1) {
+        const r = canvas.getBoundingClientRect();
+        onPointerMove(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', onPointerUp);
+
+    // --- CONTROLES Y TIEMPO ---
+    function setTime(newT) {
+      currentT = Math.max(0, Math.min(NUM_POINTS - 1, newT));
+      timeSlider.value = currentT;
+      currentTimeBadge.textContent = `t = ${currentT}`;
+      renderChart();
+    }
+
+    function updateLabels() {
+      const k1 = parseInt(windowSizeInput.value, 10);
+      const f1 = getFilterDef(k1);
+      kLabel.textContent = `k = ${k1} (${f1.name})`;
+      legendKLabel.textContent = `Tendencia con ${f1.name}`;
+
+      
+    }
+
+    function updateNoiseLabel() {
+      const val = parseInt(noiseSlider.value, 10);
+      noiseLabel.textContent = val === 0 ? 'σ = 0 (Limpio)' : `σ = ${val}`;
+    }
+
+    noiseSlider.addEventListener('input', () => {
+      updateNoiseLabel();
+      generateData(true);
+      renderChart();
+    });
+
+    windowSizeInput.addEventListener('input', () => {
+      updateLabels();
+      renderChart();
+    });
+
+    
+    
+    datasetSelect.addEventListener('change', () => {
+      generateData(false);
+      renderChart();
+    });
+
+
+    function updateTrendButtonUI() {
+      const trendBtnIcon = document.getElementById('trendBtnIcon');
+      const trendBtnText = document.getElementById('trendBtnText');
+      const legendTrendItem = document.getElementById('legendTrendItem');
+
+      if (showTrend) {
+        trendBtnIcon.textContent = '👁️';
+        trendBtnText.textContent = 'Ocultar Tendencia';
+        btnToggleTrend.classList.remove('toggle-off');
+        if (legendTrendItem) {
+          legendTrendItem.style.opacity = '1';
+          legendTrendItem.style.textDecoration = 'none';
+        }
+      } else {
+        trendBtnIcon.textContent = '👁️‍🗨️';
+        trendBtnText.textContent = 'Mostrar Tendencia';
+        btnToggleTrend.classList.add('toggle-off');
+        if (legendTrendItem) {
+          legendTrendItem.style.opacity = '0.4';
+          legendTrendItem.style.textDecoration = 'line-through';
+        }
+      }
+    }
+
+    btnToggleTrend.addEventListener('click', () => {
+      showTrend = !showTrend;
+      updateTrendButtonUI();
+      renderChart();
+    });
+
+    const legendTrendItem = document.getElementById('legendTrendItem');
+    if (legendTrendItem) {
+      legendTrendItem.addEventListener('click', () => {
+        showTrend = !showTrend;
+        updateTrendButtonUI();
+        renderChart();
+      });
+    }
+
+    btnRegenerate.addEventListener('click', () => {
+      generateData(false);
+      renderChart();
+    });
+
+    timeSlider.addEventListener('input', (e) => {
+      setTime(parseInt(e.target.value, 10));
+    });
+
+    btnStepPrev.addEventListener('click', () => {
+      stopPlay();
+      setTime(currentT - 1);
+    });
+
+    btnStepNext.addEventListener('click', () => {
+      stopPlay();
+      setTime(currentT + 1);
+    });
+
+    function togglePlay() {
+      if (isPlaying) stopPlay();
+      else startPlay();
+    }
+
+    function startPlay() {
+      isPlaying = true;
+      playText.textContent = '⏸ Pausa';
+      btnPlayPause.classList.add('active-pause');
+      btnPlayPause.classList.remove('primary');
+      
+      playInterval = setInterval(() => {
+        if (currentT >= NUM_POINTS - 1) {
+          setTime(0);
+        } else {
+          setTime(currentT + 1);
+        }
+      }, 700);
+    }
+
+    function stopPlay() {
+      isPlaying = false;
+      playText.textContent = '▶ Iniciar';
+      btnPlayPause.classList.remove('active-pause');
+      btnPlayPause.classList.add('primary');
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+    }
+
+    btnPlayPause.addEventListener('click', togglePlay);
+
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
+      if (e.key === 'ArrowRight') {
+        stopPlay();
+        setTime(currentT + 1);
+      } else if (e.key === 'ArrowLeft') {
+        stopPlay();
+        setTime(currentT - 1);
+      } else if (e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.key === 't' || e.key === 'T') {
+        showTrend = !showTrend;
+        updateTrendButtonUI();
+        renderChart();
+      }
+    });
+
+    window.addEventListener('resize', renderChart);
+
+    // Arranque inicial
+    generateData();
+    timeSlider.max = NUM_POINTS - 1;
+    updateLabels();
+    updateNoiseLabel();
+    setTime(16);
+  </script>
+</body>
+</html>
