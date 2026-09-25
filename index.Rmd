@@ -27,6 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 2026-09-25 Session 
 
 + [Transfer Function Models, additional examples](./2026/2026_TransferFunctions_1/2026_Dynamic_Regression_1.html)
++ [Interactive web application illustrating the Box Cox transformation](https://fsansegundo.github.io/frcst_imat_public/2026/luis/box_cox.html) by Luis Fernández.
 
 
 ## 2026-09-24 Session 
