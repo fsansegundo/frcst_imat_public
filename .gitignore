@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-.DS_Store
 
 ## Exclude folder
 exclude/
@@ -10,8 +9,6 @@ exclude
 data/
 data
 
-**/*.DS_Store
 .DS_Store
-*.DS_Store
-.DS_Store
-.DS_Store
+
+
