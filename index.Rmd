@@ -12,9 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ``` 
 
 <!-- ![](QR.png){height=350px} ![ ](./fig/Albufera-20110103-DSC_0065-GarcillaCangrejera.jpg){height=350px} -->
-![](QR.png){height=350px} ![ ](./fig/MochueloCasaCampo.jpg){height=350px}
+<!-- ![](QR.png){height=350px} ![ ](./fig/MochueloCasaCampo.jpg){height=350px} -->
+![](QR.png){height=350px} [![ ](./Cuco.JPG){height=350px}](./Cuco-Lavandera.JPG)
+
 <!-- ![](QR.png){height=300px} ![ ](CarracaOkavango-067-DSCN1299.JPG){height=250px} -->
-<!-- ![](QR.png){height=350px} ![ ](20170820-0923-DSCN1835-Cuco.JPG){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](Colibri-Canada.jpg){height=350px}  -->
 <!-- ![](QR.png){height=350px} ![ ](Calamon-20110126-DSC_0094a.jpeg){height=350px} -->
 <!-- ![](QR.png){height=350px} ![ ](./Trepador.png){height=350px} -->
@@ -23,6 +24,12 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- ![](QR.png){height=350px} ![ ](MilanoNegro-CasaCampo-DSCN3126.jpeg){height=300px} -->
 <!-- ![](QR.png){height=350px} ![ ](ibisbilll.JPG){height=300px} -->
 <!-- ![](QR.png){height=350px} ![ ](MountainCaribou.jpg){height=300px} -->
+
+
+
+## 2026-10-09 Session 
+
++ [Transfer Function Models, additional examples](./2026/2026-10-09 _TF2/TF_two_inputs_example.html)
 
 ## 2026-09-25 Session 
 
